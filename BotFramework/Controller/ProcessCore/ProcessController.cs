@@ -16,35 +16,20 @@ namespace BotFramework
     public interface IProcessController:IDisposable, IController
     {
         void StartProcess([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-
         void KillProcess([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-
         bool ProcessAlive([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-
         IntPtr GetIntPtr();
-
         void LeftClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-
         void RightClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-
         void DoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-
         void MoveMouse(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-
         void HoldLeft();
-
         void ReleaseLeft();
-
         void HoldRight();
-
         void ReleaseRight();
-
         void KeyboardPress(VirtualKeyCode code);
-
         void KeyboardRelease(VirtualKeyCode code);
-
         void KeyboardType(string text);
-
         void BlockInput();
     }
     public class ProcessController : IProcessController

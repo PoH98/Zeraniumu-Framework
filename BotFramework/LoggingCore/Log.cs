@@ -114,7 +114,7 @@ namespace BotFramework
             {
                 LogTextBox.Invoke((MethodInvoker)delegate
                 {
-                    LogTextBox.SelectionColor = Color.Black;
+                    LogTextBox.SelectionColor = LogTextBox.ForeColor;
                     LogTextBox.AppendText("[" + DateTime.Now.ToLongTimeString() + "]: " + log + "\n");
                 });
             }
