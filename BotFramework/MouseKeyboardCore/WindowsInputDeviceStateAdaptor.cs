@@ -1,7 +1,7 @@
 ﻿using System;
-using BotFramework.MouseKeyboardCore.Native;
+using Zeraniumu.MouseKeyboardCore.Native;
 
-namespace BotFramework.MouseKeyboardCore
+namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// An implementation of <see cref="IInputDeviceStateAdaptor"/> for Windows by calling the native <see cref="NativeMethods.GetKeyState"/> and <see cref="NativeMethods.GetAsyncKeyState"/> methods.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BotFramework.MouseKeyboardCore.Native
+namespace Zeraniumu.MouseKeyboardCore.Native
 {
 #pragma warning disable 649
     /// <summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public partial class SelectProcess : Form
     {

@@ -1,5 +1,6 @@
-# BotFramework
+# Zeraniumu Framework
 This is the framework which uses EmguCV, SharpAdb and WinAPI for controlling an emulator or a process in a user computer, performing "scripts" and "bots" actions
+Zeraniumu which is in japanese, means Geranium flower. Geranium have the meaning of we met each other, accidental.
 
 ## Disclaimer
 **This framework is NOT FOR SALE! Don't use any bot or script softwares that cost you money if they using this framework!**
@@ -19,12 +20,12 @@ This is the framework which uses EmguCV, SharpAdb and WinAPI for controlling an 
     ```
 
 2. The script should be in C# format. About the function list please preview [Wiki](#wiki)
-3. After completed the script, go to the `BotFramework.exe` and open command prompt there by pressing `shift + right click`. Type `BotFramework <your script path>` and press `Enter`
+3. After completed the script, go to the `Zeraniumu.exe` and open command prompt there by pressing `shift + right click`. Type `Zeraniumu <your script path>` and press `Enter`
 4. The script will start execute now!
 ---
 ### Method 2: Compile an exe
 1. Use any C# coding program and create new project
-2. Add reference to `BotFramework.exe`, add new class which implements interface `IScript`. For example: 
+2. Add reference to `Zeraniumu.exe`, add new class which implements interface `IScript`. For example: 
    ```
    class ImplementedScript : IScript 
    { 
@@ -410,4 +411,4 @@ Current supported emulators:
 
 > If any other emulators needed to be supported, let me know!
 
-Buy me a cup of tea: <a href="https://paypal.me/PoH98?locale.x=en_US" rel="some text">![Paypal](url("https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_200x51.png"))</a>
+Buy me a cup of tea: <a href="https://paypal.me/PoH98?locale.x=en_US" rel="some text">[Paypal]("https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_200x51.png")</a>

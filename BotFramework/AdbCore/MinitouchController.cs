@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace BotFramework.AdbCore
+namespace Zeraniumu.AdbCore
 {
     internal class MinitouchController
     {

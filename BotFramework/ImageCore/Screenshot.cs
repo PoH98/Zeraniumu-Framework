@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Xml;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public class ScreenShot : ImgData
     {        

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
-using BotFramework.MouseKeyboardCore.Native;
+using Zeraniumu.MouseKeyboardCore.Native;
 
-namespace BotFramework.MouseKeyboardCore
+namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// Implements the <see cref="IMouseSimulator"/> interface by calling the an <see cref="IInputMessageDispatcher"/> to simulate Mouse gestures.

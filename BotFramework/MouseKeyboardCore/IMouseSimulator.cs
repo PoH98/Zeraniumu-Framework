@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BotFramework.MouseKeyboardCore
+namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// The service contract for a mouse simulator for the Windows platform.

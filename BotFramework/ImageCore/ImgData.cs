@@ -8,7 +8,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     /// <summary>
     /// Interface of ImgData

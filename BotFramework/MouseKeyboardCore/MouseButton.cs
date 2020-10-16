@@ -1,4 +1,4 @@
-﻿namespace BotFramework.MouseKeyboardCore
+﻿namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// The mouse button

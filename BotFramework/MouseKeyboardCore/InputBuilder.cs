@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using BotFramework.MouseKeyboardCore.Native;
+using Zeraniumu.MouseKeyboardCore.Native;
 
-namespace BotFramework.MouseKeyboardCore
+namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// A helper class for building a list of <see cref="INPUT"/> messages ready to be sent to the native Windows API.

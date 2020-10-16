@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using BotFramework.MouseKeyboardCore.Native;
+using Zeraniumu.MouseKeyboardCore.Native;
 
-namespace BotFramework.MouseKeyboardCore
+namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// The service contract for a keyboard simulator for the Windows platform.

@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{62803528-C02E-4CC6-ABFE-4D73BC8ABC7C}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>BotFramework</RootNamespace>
-    <AssemblyName>BotFramework</AssemblyName>
+    <RootNamespace>Zeraniumu</RootNamespace>
+    <AssemblyName>Zeraniumu</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

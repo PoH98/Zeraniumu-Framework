@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     /// <summary>
     /// The base interface of all controllers

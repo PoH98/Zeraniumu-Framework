@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Linq;
 using System.Diagnostics;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     /// <summary>
     /// C# dll imports

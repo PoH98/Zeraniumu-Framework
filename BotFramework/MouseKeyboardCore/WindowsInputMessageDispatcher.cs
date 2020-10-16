@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using BotFramework.MouseKeyboardCore.Native;
+using Zeraniumu.MouseKeyboardCore.Native;
 
-namespace BotFramework.MouseKeyboardCore
+namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// Implements the <see cref="IInputMessageDispatcher"/> by calling <see cref="NativeMethods.SendInput"/>.

@@ -1,4 +1,4 @@
-﻿using BotFramework.AdbCore;
+﻿using Zeraniumu.AdbCore;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -16,7 +16,7 @@ using System.Net;
 using Emgu.CV.OCR;
 using System.Linq.Expressions;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public interface IEmulatorController: IController
     {

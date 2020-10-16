@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BotFramework.MouseKeyboardCore.Native
+namespace Zeraniumu.MouseKeyboardCore.Native
 {
     /// <summary>
     /// Specifies various aspects of a keystroke. This member can be certain combinations of the following values.

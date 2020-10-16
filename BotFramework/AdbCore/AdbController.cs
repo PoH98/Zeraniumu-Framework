@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     /// <summary>
     /// The adb system controller

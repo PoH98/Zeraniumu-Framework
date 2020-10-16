@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace BotFramework.MouseKeyboardCore.Native
+namespace Zeraniumu.MouseKeyboardCore.Native
 {
     /// <summary>
-    /// References all of the Native Windows API methods for the BotFramework.MouseKeyboardCore functionality.
+    /// References all of the Native Windows API methods for the Zeraniumu.MouseKeyboardCore functionality.
     /// </summary>
     internal static class NativeMethods
     {

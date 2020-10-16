@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public class Delay
     {

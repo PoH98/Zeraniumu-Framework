@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Runtime.CompilerServices;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public interface ILog
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public class FileWatcher
     {

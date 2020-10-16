@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     class Program
     {
@@ -35,7 +35,7 @@ namespace BotFramework
             }
             catch
             {
-                Console.WriteLine("To use this program, please use arguments with this format in cmd: \n BotFramework <scriptpath>");
+                Console.WriteLine("To use this program, please use arguments with this format in cmd: \n Zeraniumu <scriptpath>");
                 Console.ReadLine();
                 Environment.Exit(0);
             }
@@ -105,7 +105,7 @@ namespace BotFramework
             parameters.GenerateInMemory = true;
             // True - exe file generation, false - dll file generation
             parameters.GenerateExecutable = false;
-            script = "using System;\nusing System.IO;\nusing BotFramework;\nusing System.Drawing;\nusing System.Linq;\nnamespace Script{\npublic class Executer{\n" + File.ReadAllText(scriptPath) + "}}";
+            script = "using System;\nusing System.IO;\nusing Zeraniumu;\nusing System.Drawing;\nusing System.Linq;\nnamespace Script{\npublic class Executer{\n" + File.ReadAllText(scriptPath) + "}}";
         }
 
         public Assembly Compile()

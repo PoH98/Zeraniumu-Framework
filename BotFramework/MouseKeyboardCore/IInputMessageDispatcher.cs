@@ -1,7 +1,7 @@
 ﻿using System;
-using BotFramework.MouseKeyboardCore.Native;
+using Zeraniumu.MouseKeyboardCore.Native;
 
-namespace BotFramework.MouseKeyboardCore
+namespace Zeraniumu.MouseKeyboardCore
 {
     /// <summary>
     /// The contract for a service that dispatches <see cref="INPUT"/> messages to the appropriate destination.

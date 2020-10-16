@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public interface IEmulator
     {

@@ -1,4 +1,4 @@
-﻿namespace BotFramework
+﻿namespace Zeraniumu
 {
     partial class SelectProcess
     {

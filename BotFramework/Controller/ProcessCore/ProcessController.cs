@@ -8,10 +8,10 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
-using BotFramework.MouseKeyboardCore;
+using Zeraniumu.MouseKeyboardCore;
 using Emgu.CV.OCR;
 
-namespace BotFramework
+namespace Zeraniumu
 {
     public interface IProcessController:IDisposable, IController
     {
