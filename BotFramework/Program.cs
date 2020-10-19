@@ -105,7 +105,7 @@ namespace Zeraniumu
             parameters.GenerateInMemory = true;
             // True - exe file generation, false - dll file generation
             parameters.GenerateExecutable = false;
-            script = "using System;\nusing System.IO;\nusing Zeraniumu;\nusing System.Drawing;\nusing System.Linq;\nnamespace Script{\npublic class Executer{\n" + File.ReadAllText(scriptPath) + "}}";
+            script = "using System;\nusing System.IO;\nusing Zeraniumu;\nusing System.Drawing;\nusing System.Linq;\nnamespace Script{\npublic class Executer{\n" + ReadScript(scriptPath) + "}}";
         }
 
         public Assembly Compile()
@@ -125,6 +125,22 @@ namespace Zeraniumu
                 Environment.Exit(0);
             }
             return results.CompiledAssembly;
+        }
+
+        private string ReadScript(string path)
+        {
+            var script = File.ReadAllLines(path);
+            StringBuilder sb = new StringBuilder();
+            foreach(var line in script)
+            {
+                sb.AppendLine(line);
+                if(line.Trim().ToLower().StartsWith("@include"))
+                {
+                    var file = line.Trim().ToLower().Replace("@include", "").Trim();
+                    sb.Replace(line, ReadScript(file));
+                }
+            }
+            return sb.ToString();
         }
     }
 }

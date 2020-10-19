@@ -297,7 +297,7 @@ namespace Zeraniumu
                 }
             }
             watch.Stop();
-            logger.WritePrivateLog("Image processed in " + watch.ElapsedMilliseconds + "ms.", lineNumber, caller);
+            logger.WritePrivateLog("Image processed in " + watch.ElapsedMilliseconds + "ms. Matched location count: " + matched.Count, lineNumber, caller);
             return matched;
         }
         /// <summary>

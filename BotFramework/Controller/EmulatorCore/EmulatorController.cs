@@ -120,7 +120,7 @@ namespace Zeraniumu
             Config = Config.GetInstance(profileName);
             Config.ReadConfig();
             logging.SetLogPath(Path.Combine(Config.ConfigPath, "Log") + "\\");
-            if(emulator == null)
+            if(emulator == null || !Found)
             {
                 //No installed emulator found
                 throw new Exception("No installed emulator found!");
