@@ -55,7 +55,7 @@ This line will replaced with the file name you mention and reusable. Put it at t
 ```
 @include anotherScript.txt
 ```
-
+---
 ## Log
 > Example:
 ```
