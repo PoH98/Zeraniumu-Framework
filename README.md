@@ -20,8 +20,9 @@ Zeraniumu which is in japanese, means Geranium flower. Geranium have the meaning
     ```
 
 2. The script should be in C# format. About the function list please preview [Wiki](#wiki)
-3. After completed the script, go to the `Zeraniumu.exe` and open command prompt there by pressing `shift + right click`. Type `Zeraniumu <your script path>` and press `Enter`
-4. The script will start execute now!
+3. Here will having a special function. As we can't build classes in this method, the script supports `@include <another file>`. Its function is override the specific line with that specific file you defined. Hence you can reuse the part of code in anywhere.
+4. After completed the script, go to the `Zeraniumu.exe` and open command prompt there by pressing `shift + right click`. Type `Zeraniumu <your script path>` and press `Enter`
+5. The script will start execute now!
 ---
 ### Method 2: Compile an exe
 1. Use any C# coding program and create new project
@@ -46,6 +47,15 @@ Zeraniumu which is in japanese, means Geranium flower. Geranium have the meaning
 Here is some code example and function list of the whole bot framework.
 ## Preparation
 Before anything starts, we need to get a log file first. This log file will record almost all your method calls at which line, which function and etc. This will be helpful on debugging!
+## Direct run console special method
+The below functions is the methods you can use in direct run console method
+### @include <script file name>
+This line will replaced with the file name you mention and reusable. Put it at the line you need to be override with the code in another file.
+> Example:
+```
+@include anotherScript.txt
+```
+
 ## Log
 > Example:
 ```
