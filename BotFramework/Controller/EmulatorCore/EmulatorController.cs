@@ -83,6 +83,7 @@ namespace Zeraniumu
         /// </summary>
         public EmulatorController(ILog logging, Panel docker = null, string arguments = null, string profileName = "Bot", [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
+            
             if (!Directory.Exists("Emulators"))
             {
                 Directory.CreateDirectory("Emulators");

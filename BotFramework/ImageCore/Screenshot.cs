@@ -374,5 +374,31 @@ namespace Zeraniumu
             tess.Recognize();
             return tess.GetUTF8Text();
         }
+
+        /// <summary>
+        /// Check if object moved
+        /// </summary>
+        /// <param name="lastImage"></param>
+        /// <param name="area"></param>
+        /// <returns></returns>
+        public virtual bool Moved(ScreenShot lastImage, Rectangle area)
+        {
+            if (Bgr)
+            {
+                var img = (Image<Bgr, byte>)image;
+                using (var diffFrame = img.AbsDiff((lastImage.image as Image<Bgr, byte>)))
+                {
+                    return diffFrame.CountNonzero()[0] > 0;
+                }
+            }
+            else
+            {
+                var img = (Image<Rgb, byte>)image;
+                using (var diffFrame = img.AbsDiff((lastImage.image as Image<Rgb, byte>)))
+                {
+                    return diffFrame.CountNonzero()[0] > 0;
+                }
+            }
+        }
     }
 }

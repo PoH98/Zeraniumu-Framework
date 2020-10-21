@@ -179,14 +179,29 @@ namespace Zeraniumu
         /// </summary>
         public void Dispose()
         {
+            Dispose(false);
+        }
+
+        ~ImgData()
+        {
+            Dispose(false);
+        }
+
+        bool _isDisposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+                return;
+            _isDisposed = true;
             if (Bgr)
             {
-                 (image as Image<Bgr, byte>).Dispose();
+                (image as Image<Bgr, byte>).Dispose();
             }
             else
             {
-                 (image as Image<Rgb, byte>).Dispose();
+                (image as Image<Rgb, byte>).Dispose();
             }
+            GC.SuppressFinalize(this);
             GC.Collect();
         }
         /// <summary>
