@@ -381,7 +381,7 @@ namespace Zeraniumu
         /// <param name="lastImage"></param>
         /// <param name="area"></param>
         /// <returns></returns>
-        public virtual bool Moved(ScreenShot lastImage, Rectangle area)
+        public virtual bool Moved(ScreenShot lastImage)
         {
             if (Bgr)
             {

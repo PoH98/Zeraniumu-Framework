@@ -409,6 +409,18 @@ Recoginize text from image. Make sure you cropped the image which left the text 
 var text = iimagedata.OCR(core);
 ```
 
+### Moved
+Detect if the image have something moved. Return true if yes, else false.
+> Example:
+```
+var lastimage = core.Screenshot();
+if((iimagedata as Screenshot).Moved(lastimage))
+{
+    //Something moved
+}
+```
+
+
 ---
 # RoadMap
 
@@ -421,4 +433,4 @@ Current supported emulators:
 
 > If any other emulators needed to be supported, let me know!
 
-Buy me a cup of tea: <a href="https://paypal.me/PoH98?locale.x=en_US" rel="some text">[Paypal]("https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_200x51.png")</a>
+Buy me a cup of tea: <a href="https://paypal.me/PoH98?locale.x=en_US" rel="some text">Paypal</a>
