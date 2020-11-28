@@ -106,6 +106,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FileWatcher.cs" />
+    <Compile Include="Helper\BitmapHelper.cs" />
+    <Compile Include="Helper\ComputerHelper.cs" />
     <Compile Include="ImageCore\ImageException.cs" />
     <Compile Include="ImageCore\ImgData.cs" />
     <Compile Include="ImageCore\Screenshot.cs" />

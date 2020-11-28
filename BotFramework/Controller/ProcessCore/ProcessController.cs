@@ -10,6 +10,8 @@ using System.Threading;
 using System.Windows.Forms;
 using Zeraniumu.MouseKeyboardCore;
 using Emgu.CV.OCR;
+using Zeraniumu.Helper;
+using System.ComponentModel;
 
 namespace Zeraniumu
 {
@@ -41,6 +43,8 @@ namespace Zeraniumu
         private string arguments;
         private InputSimulator inputSimulator;
         private Random rnd = new Random();
+        private bool DirectXCapture = false;
+        private Rectangle? rect = null;
         /// <summary>
         /// Tesseract object
         /// </summary>
@@ -59,6 +63,7 @@ namespace Zeraniumu
         public ProcessController(ILog logger, string processPath, string processName, string arguments = null)
         {
             this.logger = logger;
+            this.logger.SetLogPath("Log\\");
             this.processName = processName;
             this.processPath = processPath;
             this.arguments = arguments;
@@ -77,14 +82,61 @@ namespace Zeraniumu
             Rectangle rc = new Rectangle();
             Imports.GetWindowRect(handle, ref rc);
             Bitmap bmp = new Bitmap(rc.Width, rc.Height, PixelFormat.Format32bppArgb);
-            Graphics gfxBmp = Graphics.FromImage(bmp);
-            IntPtr hdcBitmap = gfxBmp.GetHdc();
-            Imports.PrintWindow(handle, hdcBitmap, 0);
-            gfxBmp.ReleaseHdc(hdcBitmap);
-            gfxBmp.Dispose();
-            logger.WritePrivateLog("Screenshot saved to memory used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
-            s.Stop();
-            return new ScreenShot(bmp, logger, Bgr_Rgb);
+            for (int x = 0; x < 5; x++)
+            {
+                if(x > 3)
+                {
+                    //Try use DirectX
+                    DirectXCapture = true;
+                }
+                if (!DirectXCapture)
+                {
+                    Graphics gfxBmp = Graphics.FromImage(bmp);
+                    IntPtr hdcBitmap = gfxBmp.GetHdc();
+                    Imports.PrintWindow(handle, hdcBitmap, 0);
+                    gfxBmp.ReleaseHdc(hdcBitmap);
+                    gfxBmp.Dispose();
+                }
+                else
+                {
+                    IntPtr desktopDc;
+                    IntPtr memoryDc;
+                    IntPtr bitmap;
+                    IntPtr oldBitmap;
+                    desktopDc = Imports.GetWindowDC(handle);
+                    memoryDc = Imports.CreateCompatibleDC(desktopDc);
+                    bitmap = Imports.CreateCompatibleBitmap(desktopDc, rc.Width, rc.Height);
+                    oldBitmap = Imports.SelectObject(memoryDc, bitmap);
+                    if (Imports.BitBlt(memoryDc, 0, 0, rc.Width, rc.Height, desktopDc, rc.Left, rc.Top, 0x00CC0020 | 0x40000000))
+                    {
+                        bmp = Image.FromHbitmap(bitmap);
+                    }
+                    else
+                    {
+                        logger.WritePrivateLog("Screenshot failed on GDI+!", lineNumber, caller);
+                        throw new Win32Exception("Screenshot failed on GDI+ and PrintWindow! I can't processed anymore! Sorry! TAT");
+                    }
+                    Imports.SelectObject(memoryDc, oldBitmap);
+                    Imports.DeleteObject(bitmap);
+                    Imports.DeleteDC(memoryDc);
+                    Imports.ReleaseDC(handle, desktopDc);
+                }
+                if (bmp.AllBlack())
+                {
+                    logger.WritePrivateLog("Screenshot fetched all black!", lineNumber, caller);
+                    continue;
+                }
+                logger.WritePrivateLog("Screenshot saved to memory used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
+                s.Stop();
+            }
+            if (rect.HasValue)
+            {
+                return new ScreenShot(bmp, logger, Bgr_Rgb).Crop(rect.Value);
+            }
+            else
+            {
+                return new ScreenShot(bmp, logger, Bgr_Rgb);
+            }
         }
         /// <summary>
         /// Get IntPtr of the process
@@ -109,6 +161,8 @@ namespace Zeraniumu
             {
                 return;
             }
+            proc.CloseMainWindow();
+            Thread.Sleep(1000);
             proc.Kill();
             proc = null;
         }
@@ -324,6 +378,12 @@ namespace Zeraniumu
             {
                 logger.WriteLog("Downloading...(" + e.ProgressPercentage + ")", Color.Cyan);
             }
+        }
+
+        public void SetImageRect(Rectangle rect)
+        {
+            this.rect = rect;
+            logger.WritePrivateLog("Overrided capture rect as " + this.rect.Value.X + " " + this.rect.Value.Y + " " + this.rect.Value.Width + " " + this.rect.Value.Height);
         }
     }
 }

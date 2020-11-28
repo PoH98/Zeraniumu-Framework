@@ -69,18 +69,6 @@ namespace Zeraniumu.AdbCore
             bool successConnect = false;
             do
             {
-                try
-                {
-                    controller.Execute("/data/local/tmp/" + rndMiniTouch);
-                }
-                catch(Exception ex)
-                {
-                    if(ex.Message == "Device Offline")
-                    {
-                        throw new Exception("Device Offline");
-                    }
-                }
-
                 controller.CreateForward($"tcp:{minitouchPort}", "localabstract:minitouch");
                 minitouchSocket = new TcpSocket();
                 minitouchSocket.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), minitouchPort));
@@ -105,7 +93,7 @@ namespace Zeraniumu.AdbCore
 
         internal void Tap(Point location)
         {
-            if(minitouchSocket == null)
+            if(minitouchSocket == null || !minitouchSocket.Connected)
             {
                 Install();
             }
@@ -114,7 +102,17 @@ namespace Zeraniumu.AdbCore
             int pressure = (int)Math.Round(rnd.Next(50, 200) * Scale);
             string cmd = $"d 0 {x} {y} {pressure}\nc\nu 0\nc\n";
             byte[] bytes = AdbClient.Encoding.GetBytes(cmd);
-            minitouchSocket.Send(bytes, 0, bytes.Length, SocketFlags.None);
+            try
+            {
+                minitouchSocket.Send(bytes, 0, bytes.Length, SocketFlags.None);
+            }
+            catch
+            {
+                Install();
+                Thread.Sleep(3000);
+                Tap(location);
+            }
+
         }
 
         internal void LongTap(Point location, int interval)

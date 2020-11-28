@@ -1,6 +1,7 @@
 ﻿using SharpAdbClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -23,6 +24,15 @@ namespace Zeraniumu
         private string adbipport;
         private Framebuffer framebuffer;
         private ILog logger;
+        private ProcessStartInfo checknet = new ProcessStartInfo()
+        {
+            FileName = "cmd",
+            Arguments = "/c netstat -aon",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden
+        };
         /// <summary>
         /// Create new adb controller
         /// </summary>
@@ -31,6 +41,7 @@ namespace Zeraniumu
         {
             server.StartServer(Path.Combine(adbPath, "adb.exe"), false);
             this.logger = logger;
+            KillPortUsage();
             monitor = new DeviceMonitor(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)));
             monitor.DeviceConnected += OnDeviceConnected;
             monitor.DeviceDisconnected += OnDeviceDisconnected;
@@ -45,11 +56,37 @@ namespace Zeraniumu
         {
             server.StartServer(Path.Combine(adbPath, "adb.exe"), false);
             this.logger = logger;
+            KillPortUsage();
             monitor = new DeviceMonitor(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)));
             monitor.DeviceConnected += OnDeviceConnected;
             monitor.DeviceDisconnected += OnDeviceDisconnected;
             devices = client.GetDevices();
             SelectDevice(adbipsocket);
+        }
+
+        private void KillPortUsage()
+        {
+            var cmd = Process.Start(checknet);
+            var output = cmd.StandardOutput.ReadToEnd();
+            var lines = output.Split('\n');
+            foreach(var line in lines)
+            {
+                try
+                {
+                    if (line.Contains(adbipport))
+                    {
+                        var pid = Convert.ToInt32(line.Substring(line.LastIndexOf(" ")).Trim());
+                        Process p = Process.GetProcessById(pid);
+                        p.CloseMainWindow();
+                        Thread.Sleep(1000);
+                        p.Kill();
+                    }
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         /// <summary>
@@ -77,17 +114,16 @@ namespace Zeraniumu
         /// <summary>
         /// Await for device startup complete
         /// </summary>
-        internal async Task<bool> WaitDeviceStart()
+        internal void WaitDeviceStart()
         {
             string output;
             do
             {
                 output = Execute("getprop sys.boot_completed");
-                await Task.Delay(1000);
+                Thread.Sleep(1000);
             }
             while (output == null || !output.Contains("1"));
             logger.WritePrivateLog("device wait completed");
-            return true;
         }
         /// <summary>
         /// Execute adb command to selected device

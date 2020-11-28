@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace Zeraniumu
 {
@@ -25,5 +26,9 @@ namespace Zeraniumu
         /// </summary>
         /// <returns></returns>
         object Tesseract { get; set; }
+        /// <summary>
+        /// Set the screenshot default crop location to remove unwanted things like window's border
+        /// </summary>
+        void SetImageRect(Rectangle rect);
     }
 }

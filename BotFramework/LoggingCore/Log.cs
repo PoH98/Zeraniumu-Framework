@@ -24,12 +24,15 @@ namespace Zeraniumu
         /// </summary>
         public virtual void ClearOldLogs()
         {
-            foreach(var file in Directory.GetFiles(logfilepath.Remove(logfilepath.LastIndexOf('\\'))))
+            if (logfilepath.Contains("\\"))
             {
-                FileInfo info = new FileInfo(file);
-                if((DateTime.Now - info.CreationTime).TotalDays >= 7)
+                foreach (var file in Directory.GetFiles(logfilepath.Remove(logfilepath.LastIndexOf('\\'))))
                 {
-                    info.Delete();
+                    FileInfo info = new FileInfo(file);
+                    if ((DateTime.Now - info.CreationTime).TotalDays >= 7)
+                    {
+                        info.Delete();
+                    }
                 }
             }
         }
@@ -43,6 +46,10 @@ namespace Zeraniumu
             string oldPath = logfilepath;
             if (logPath.EndsWith("\\"))
             {
+                if (!Directory.Exists(logPath))
+                {
+                    Directory.CreateDirectory(logPath);
+                }
                 //path
                 logPath = Path.Combine(logPath, DateTime.Now.ToString().Replace(' ', '_').Replace('/', '_').Replace(':', '_') + ".log");
             }

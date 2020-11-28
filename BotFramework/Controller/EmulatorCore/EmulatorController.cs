@@ -10,11 +10,11 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using Zeraniumu.Helper;
 using System.Text.RegularExpressions;
 using System.Net;
 using Emgu.CV.OCR;
-using System.Linq.Expressions;
+using System.Net.Http.Headers;
 
 namespace Zeraniumu
 {
@@ -34,6 +34,7 @@ namespace Zeraniumu
         void CloseSystemBar();
         void OpenSystemBar();
         void OpenPlayStore(string packageName);
+        void ResizeToPreferedSize();
     }
     /// <summary>
     /// Emulator's actions
@@ -53,6 +54,15 @@ namespace Zeraniumu
         private int StartExecute = 0;
         private int CaptureError = 0;
         private Random rnd = new Random();
+        private Rectangle? rect = null;
+        /// <summary>
+        /// Resize the screenshot to make sure all captured images are the same size
+        /// </summary>
+        public bool ResizeScreenshot { get; set; } = true;
+        /// <summary>
+        /// Set the screenshot method
+        /// </summary>
+        public EmulatorCaptureMethod CaptureMethod { get; set; } = EmulatorCaptureMethod.WinApiCapture;
         /// <summary>
         /// Used to check if we need to kept the bot running on background. Used for multiple purpose like capturing screenshots and etc
         /// </summary>
@@ -74,7 +84,7 @@ namespace Zeraniumu
         /// </summary>
         public double TapScale { get; set; } = 1;
         /// <summary>
-        /// Tesseract object
+        /// Tesseract object, normally won't use this so just ignore it
         /// </summary>
         public object Tesseract { get; set; }
 
@@ -129,7 +139,12 @@ namespace Zeraniumu
             this.docker = docker;
             logger = logging;
             logger.WritePrivateLog("Emulator Controller created", lineNumber, caller);
+            if(ComputerHelper.getScalingFactor() != 1)
+            {
+                logger.WriteLog("Please set your scaling factor to 100% before using this program to ensure everything works well!", Color.Red);
+            }
         }
+
         /// <summary>
         /// Start the emulator, if emulator is already started then do nothing
         /// </summary>
@@ -269,8 +284,8 @@ namespace Zeraniumu
             Thread.Sleep(500);
             try
             {
-                emulatorProcess.Close();
                 emulatorProcess.CloseMainWindow();
+                Thread.Sleep(1000);
                 emulatorProcess.Kill();
             }
             catch
@@ -283,6 +298,11 @@ namespace Zeraniumu
 
         private IntPtr getCurrentAndroidHWnd()
         {
+            if(emulatorProcess == null)
+            {
+                StartEmulator();
+                ConnectEmulator();
+            }
             if (!docked)
             {
                 return emulatorProcess.MainWindowHandle;
@@ -366,62 +386,78 @@ namespace Zeraniumu
         /// Screenshot the emulator screen using PrintWindow. Careful here as we might get blank image if exception found
         /// </summary>
         /// <returns></returns>
-        public IImageData Screenshot(bool Bgr_Rgb = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        public virtual IImageData Screenshot(bool Bgr_Rgb = true, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
             Stopwatch s = Stopwatch.StartNew();
+            Retry:
             try
             {
-                Retry:
-                if(CaptureError >= 5)
+                if (!KeepBackground)
                 {
-                    IImageData result;
-                    //Capture failed, we need use another method!
-                    if(CaptureError == 5)
-                        logger.WriteLog("Unable to use WinAPI.PrintWindow Capture! Trying to use Graphics.Copy", Color.Red);
+                    CaptureMethod = EmulatorCaptureMethod.ForegroundCapture;
+                }
+                if (CaptureError >= 5)
+                {
                     if (KeepBackground)
                     {
+                        KeepBackground = !KeepBackground;
+                    }
+                    CaptureMethod = EmulatorCaptureMethod.AdbCapture;
+                }
+                IImageData result;
+                switch (CaptureMethod)
+                {
+                    case EmulatorCaptureMethod.AdbCapture:
                         result = adbController.Screenshot().Result;
+                        break;
+                    case EmulatorCaptureMethod.ForegroundCapture:
+                        result = ForegroundCapture(lineNumber, caller);
+                        break;
+                    case EmulatorCaptureMethod.WinApiCapture:
+                        result = WinApiCapture(lineNumber, caller);
+                        break;
+                    default:
+                        throw new ArgumentException("How the hell can you input something like this to me??");
+                }
+                CaptureError = 0;
+                if (ResizeScreenshot)
+                {
+                    if (rect.HasValue)
+                    {
+                        return result.Crop(rect.Value);
                     }
                     else
                     {
-                        result = ForegroundCapture().Crop(emulator.ActualSize());
+                        return result.Crop(emulator.ActualSize());
                     }
-                    s.Stop();
-                    logger.WritePrivateLog("Screenshot saved to memory used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
+                }
+                else
+                {
                     return result;
                 }
-                var handle = getCurrentAndroidHWnd();
-                Rectangle rc = new Rectangle();
-                Imports.GetWindowRect(handle, ref rc);
-                Bitmap bmp = new Bitmap(rc.Width, rc.Height, PixelFormat.Format32bppArgb);
-                Imports.RedrawWindow(handle, rc, IntPtr.Zero, 0x85);
-                Imports.UpdateWindow(handle);
-                Graphics gfxBmp = Graphics.FromImage(bmp);
-                IntPtr hdcBitmap = gfxBmp.GetHdc();
-                Imports.PrintWindow(handle, hdcBitmap, 0);
-                gfxBmp.ReleaseHdc(hdcBitmap);
-                gfxBmp.Dispose();
-                if (AllBlack(bmp))
-                {
-                    CaptureError++;
-                    bmp.Dispose();
-                    logger.WritePrivateLog("Screenshot get black image, retrying now!", lineNumber, caller);
-                    goto Retry;
-                }
-                CaptureError = 0;
-                s.Stop();
-                logger.WritePrivateLog("Screenshot saved to memory used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
-                return new ScreenShot(bmp, logger, false).Crop(emulator.ActualSize());
             }
             catch(Exception ex)
             {
-                var bmp = new Bitmap(emulator.DefaultSize().Width, emulator.DefaultSize().Height);
-                logger.WritePrivateLog("Screenshot found exception: " + ex.Message  + " used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
-                return new ScreenShot(bmp, logger).Crop(emulator.ActualSize());
+                if(ex is InvalidDataException)
+                {
+                    goto Retry;
+                }
+                Bitmap bmp;
+                if (rect.HasValue)
+                {
+                    bmp = new Bitmap(emulator.DefaultSize().Width, emulator.DefaultSize().Height);
+                }
+                else
+                {
+                    bmp = new Bitmap(emulator.DefaultSize().Width, emulator.DefaultSize().Height);
+                }
+                //            logger.WritePrivateLog("Screenshot saved to memory used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
+                logger.WritePrivateLog("Screenshot found exception: " + ex.Message  + " at line "+ new StackTrace(ex, true).GetFrame(0).GetFileLineNumber() + " used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
+                return new ScreenShot(bmp, logger, false);
             }
         }
 
-        private IImageData ForegroundCapture()
+        private IImageData ForegroundCapture(int lineNumber, string caller)
         {
             var handle = getCurrentAndroidHWnd();
             Rectangle rc = new Rectangle();
@@ -432,43 +468,45 @@ namespace Zeraniumu
                 Imports.SetForegroundWindow(handle);
                 graphics.CopyFromScreen(rc.X, rc.Y, 0, 0, new Size(rc.Width, rc.Height), CopyPixelOperation.SourceCopy);
             }
+            if (bmp.AllBlack())
+            {
+                CaptureError++;
+                bmp.Dispose();
+                logger.WritePrivateLog("Screenshot get black image, retrying now!", lineNumber, caller);
+                throw new InvalidDataException();
+            }
             return new ScreenShot(bmp, logger, false);
         }
 
-        private bool AllBlack(Bitmap bmp)
+        private IImageData WinApiCapture(int lineNumber, string caller)
         {
-            // Lock the bitmap's bits.  
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
-
-            // Get the address of the first line.
-            IntPtr ptr = bmpData.Scan0;
-
-            // Declare an array to hold the bytes of the bitmap.
-            int bytes = bmpData.Stride * bmp.Height;
-            byte[] rgbValues = new byte[bytes];
-
-            // Copy the RGB values into the array.
-            Marshal.Copy(ptr, rgbValues, 0, bytes);
-
-            // Scanning for non-zero bytes
-            bool allBlack = true;
-            for (int index = 0; index < rgbValues.Length; index++)
-                if (rgbValues[index] != 0)
-                {
-                    allBlack = false;
-                    break;
-                }
-            // Unlock the bits.
-            bmp.UnlockBits(bmpData);
-            return allBlack;
+            var handle = getCurrentAndroidHWnd();
+            Rectangle rc = new Rectangle();
+            Imports.GetWindowRect(handle, ref rc);
+            Bitmap bmp = new Bitmap(rc.Width, rc.Height, PixelFormat.Format32bppArgb);
+            Imports.RedrawWindow(handle, rc, IntPtr.Zero, 0x85);
+            Imports.UpdateWindow(handle);
+            Graphics gfxBmp = Graphics.FromImage(bmp);
+            IntPtr hdcBitmap = gfxBmp.GetHdc();
+            Imports.PrintWindow(handle, hdcBitmap, 0);
+            gfxBmp.ReleaseHdc(hdcBitmap);
+            gfxBmp.Dispose();
+            if (bmp.AllBlack())
+            {
+                CaptureError++;
+                bmp.Dispose();
+                logger.WritePrivateLog("Screenshot get black image, retrying now!", lineNumber, caller);
+                throw new InvalidDataException();
+            }
+            return new ScreenShot(bmp, logger, false);
         }
+        
         /// <summary>
         /// Attach connection to emulator
         /// </summary>
         /// <param name="lineNumber"></param>
         /// <param name="caller"></param>
-        public async void ConnectEmulator([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        public void ConnectEmulator([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
             var errorCount = 0;
             Loop:
@@ -476,29 +514,21 @@ namespace Zeraniumu
             {
                 adbController = new AdbController(AdbPath, logger);
                 adbController.SelectDevice(emulator.AdbIpPort());
-                await adbController.WaitDeviceStart();
+                adbController.WaitDeviceStart();
                 minitouchController = new MinitouchController(adbController, MinitouchPath, TapScale);
                 minitouchController.Install();
                 adbController.Execute("input keyevent KEYCODE_HOME");
                 Thread.Sleep(3000);
                 adbController.Execute("settings put system font_scale 1.0");
-                var capt = Screenshot().ToBitmap();
-                if (emulator.DefaultSize().Width != capt.Width && emulator.DefaultSize().Height != capt.Height)
-                {
-                    StopEmulator();
-                    logger.WriteLog("Resolution not supported, resizing...", Color.Red);
-                    emulator.SetResolution(emulator.DefaultSize().Width, emulator.DefaultSize().Height, 192);
-                    StartEmulator();
-                    ConnectEmulator();
-                }
                 emulator.UnUnbotify(this);
                 logger.WriteLog("Emulator Connection Success!");
             }
-            catch
+            catch(Exception ex)
             {
                 errorCount++;
-                if(errorCount > 10)
+                if(errorCount > 15)
                 {
+                    logger.WriteLog(ex.Message, Color.Red);
                     StopEmulator();
                     Thread.Sleep(3000);
                     errorCount = 0;
@@ -713,5 +743,36 @@ namespace Zeraniumu
                 logger.WriteLog("Downloading...(" + e.ProgressPercentage + ")", Color.Cyan);
             }
         }
+        /// <summary>
+        /// Resize the emulator to prefered size set in Emulator's dll
+        /// </summary>
+        /// <param name="rect"></param>
+        public void ResizeToPreferedSize()
+        {
+            var capt = Screenshot().ToBitmap();
+            if (emulator.DefaultSize().Width != capt.Width && emulator.DefaultSize().Height != capt.Height)
+            {
+                StopEmulator();
+                logger.WriteLog("Resolution not supported, resizing...", Color.Red);
+                emulator.SetResolution(emulator.DefaultSize().Width, emulator.DefaultSize().Height, 192);
+                StartEmulator();
+                ConnectEmulator();
+            }
+        }
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="rect"></param>
+        public void SetImageRect(Rectangle rect)
+        {
+            this.rect = rect;
+            logger.WritePrivateLog("Overrided capture rect as " + this.rect.Value.X + " " + this.rect.Value.Y + " " + this.rect.Value.Width + " " + this.rect.Value.Height);
+        }
+    }
+    public enum EmulatorCaptureMethod
+    {
+        AdbCapture,
+        WinApiCapture,
+        ForegroundCapture
     }
 }
