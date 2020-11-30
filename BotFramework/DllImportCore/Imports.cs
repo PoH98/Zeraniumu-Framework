@@ -489,19 +489,40 @@ namespace Zeraniumu
         /// <returns></returns>
         [DllImport("gdi32.dll")]
         public static extern bool BitBlt(IntPtr hdcDest, int nxDest, int nyDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc, int dwRop);
-
+        /// <summary>
+        /// Create Bitmap from hdc
+        /// </summary>
+        /// <param name="hdc"></param>
+        /// <param name="width"></param>
+        /// <param name="nHeight"></param>
+        /// <returns></returns>
         [DllImport("gdi32.dll")]
         public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int width, int nHeight);
-
+        /// <summary>
+        /// Create dc from hdc
+        /// </summary>
+        /// <param name="hdc"></param>
+        /// <returns></returns>
         [DllImport("gdi32.dll")]
         public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
-
+        /// <summary>
+        /// Clean up the dc
+        /// </summary>
+        /// <param name="hdc"></param>
+        /// <returns></returns>
         [DllImport("gdi32.dll")]
         public static extern IntPtr DeleteDC(IntPtr hdc);
-
+        /// <summary>
+        /// Clean up the hbitmap object
+        /// </summary>
+        /// <param name="hObject"></param>
+        /// <returns></returns>
         [DllImport("gdi32.dll")]
         public static extern IntPtr DeleteObject(IntPtr hObject);
-
+        /// <summary>
+        /// Get Desktop's IntPtr
+        /// </summary>
+        /// <returns></returns>
         [DllImport("user32.dll")]
         public static extern IntPtr GetDesktopWindow();
 
@@ -520,6 +541,26 @@ namespace Zeraniumu
         {
             VERTRES = 10,
             DESKTOPVERTRES = 117,
+        }
+        /// <summary>
+        /// Yet another version of SendMessage, which input IntPtr for lparam
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="Msg"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        [DllImport("User32.dll")]
+        public static extern int SendMessage(IntPtr hWnd,int Msg, int wParam, IntPtr lParam);
+        /// <summary>
+        /// Create LParam for SendMessage
+        /// </summary>
+        /// <param name="LoWord"></param>
+        /// <param name="HiWord"></param>
+        /// <returns></returns>
+        public static IntPtr CreateLParam(int LoWord, int HiWord)
+        {
+            return (IntPtr)((HiWord << 16) | (LoWord & 0xffff));
         }
     }
 }

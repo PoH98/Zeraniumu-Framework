@@ -101,11 +101,12 @@ namespace Zeraniumu
             parameters.ReferencedAssemblies.Add("System.Windows.Forms.dll");
             parameters.ReferencedAssemblies.Add("System.IO.dll");
             parameters.ReferencedAssemblies.Add("System.Linq.dll");
+            parameters.ReferencedAssemblies.Add("System.Core.dll");
             // True - memory generation, false - external file generation
             parameters.GenerateInMemory = true;
             // True - exe file generation, false - dll file generation
             parameters.GenerateExecutable = false;
-            script = "using System;\nusing System.IO;\nusing Zeraniumu;\nusing System.Drawing;\nusing System.Linq;\nnamespace Script{\npublic class Executer{\n" + ReadScript(scriptPath) + "}}";
+            script = "using System;\nusing System.Collections.Generic;\nusing System.IO;\nusing Zeraniumu;\nusing System.Drawing;\nusing System.Linq;\nnamespace Script{\npublic class Executer{\n" + ReadScript(scriptPath) + "}}";
         }
 
         public Assembly Compile()
@@ -117,7 +118,7 @@ namespace Zeraniumu
 
                 foreach (CompilerError error in results.Errors)
                 {
-                    sb.AppendLine(String.Format("Error ({0}): {1} at line {2} and {3}", error.ErrorNumber, error.ErrorText, error.Line - 6, error.Column));
+                    sb.AppendLine(String.Format("Error ({0}): {1} at line {2} and {3}", error.ErrorNumber, error.ErrorText, error.Line - 7, error.Column));
                 }
 
                 Console.WriteLine(sb.ToString());

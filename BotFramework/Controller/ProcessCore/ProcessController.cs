@@ -23,7 +23,8 @@ namespace Zeraniumu
         IntPtr GetIntPtr();
         void LeftClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void RightClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
-        void DoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+        void RightDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+        void LeftDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void MoveMouse(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void HoldLeft();
         void ReleaseLeft();
@@ -232,14 +233,13 @@ namespace Zeraniumu
             }
         }
         /// <summary>
-        /// Send left click
+        /// Send left click at location
         /// </summary>
         /// <param name="location"></param>
         public void LeftClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
-            MoveMouse(location, lineNumber, caller);
-            HoldLeft();
-            ReleaseLeft();
+            Imports.SendMessage(proc.MainWindowHandle, 0x201, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+            Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
         }
         /// <summary>
         /// Send right click
@@ -247,21 +247,26 @@ namespace Zeraniumu
         /// <param name="location"></param>
         public void RightClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
-            MoveMouse(location, lineNumber, caller);
-            HoldRight();
-            ReleaseRight();
+            Imports.SendMessage(proc.MainWindowHandle, 0x204, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+            Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
         }
         /// <summary>
-        /// Send double click
+        /// Send double left click
         /// </summary>
         /// <param name="location"></param>
-        public void DoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        public void LeftDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
-            MoveMouse(location, lineNumber, caller);
-            HoldLeft();
-            ReleaseLeft();
-            HoldLeft();
-            ReleaseLeft();
+            Imports.SendMessage(proc.MainWindowHandle, 0x203, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+            Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+        }
+        /// <summary>
+        /// Send double right click
+        /// </summary>
+        /// <param name="location"></param>
+        public void RightDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            Imports.SendMessage(proc.MainWindowHandle, 0x206, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+            Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
         }
         /// <summary>
         /// Move the mouse to location
