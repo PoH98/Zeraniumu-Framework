@@ -44,8 +44,8 @@ namespace Zeraniumu
         private string arguments;
         private InputSimulator inputSimulator;
         private Random rnd = new Random();
-        private bool DirectXCapture = false;
         private Rectangle? rect = null;
+        private IntPtr Screencaptureptr = IntPtr.Zero;
         /// <summary>
         /// Tesseract object
         /// </summary>
@@ -54,6 +54,14 @@ namespace Zeraniumu
         /// Scale the click location
         /// </summary>
         public double ClickScale { get; set; } = 1;
+        /// <summary>
+        /// The screenshot method. Switch this if your screenshot not works
+        /// </summary>
+        public CaptureMethod CaptureMethod { get; set; } = CaptureMethod.GDIPlus;
+        /// <summary>
+        /// The clicking method. Switch this if your app isn't be clicked
+        /// </summary>
+        public ClickMethod ClickMethod { get; set; } = ClickMethod.RealMouseMove;
         /// <summary>
         /// Definee a new ProcessController
         /// </summary>
@@ -88,9 +96,9 @@ namespace Zeraniumu
                 if(x > 3)
                 {
                     //Try use DirectX
-                    DirectXCapture = true;
+                    CaptureMethod = CaptureMethod.GraphicCopy;
                 }
-                if (!DirectXCapture)
+                if (CaptureMethod == CaptureMethod.HDCCapture)
                 {
                     Graphics gfxBmp = Graphics.FromImage(bmp);
                     IntPtr hdcBitmap = gfxBmp.GetHdc();
@@ -98,13 +106,16 @@ namespace Zeraniumu
                     gfxBmp.ReleaseHdc(hdcBitmap);
                     gfxBmp.Dispose();
                 }
-                else
+                else if(CaptureMethod == CaptureMethod.GDIPlus)
                 {
                     IntPtr desktopDc;
                     IntPtr memoryDc;
                     IntPtr bitmap;
                     IntPtr oldBitmap;
-                    desktopDc = Imports.GetWindowDC(handle);
+                    Imports.SetForegroundWindow(handle);
+                    Imports.GetForegroundWindow();
+                    Screencaptureptr = Imports.GetDesktopWindow();
+                    desktopDc = Imports.GetWindowDC(Screencaptureptr);
                     memoryDc = Imports.CreateCompatibleDC(desktopDc);
                     bitmap = Imports.CreateCompatibleBitmap(desktopDc, rc.Width, rc.Height);
                     oldBitmap = Imports.SelectObject(memoryDc, bitmap);
@@ -122,6 +133,10 @@ namespace Zeraniumu
                     Imports.DeleteDC(memoryDc);
                     Imports.ReleaseDC(handle, desktopDc);
                 }
+                else
+                {
+
+                }
                 if (bmp.AllBlack())
                 {
                     logger.WritePrivateLog("Screenshot fetched all black!", lineNumber, caller);
@@ -129,6 +144,7 @@ namespace Zeraniumu
                 }
                 logger.WritePrivateLog("Screenshot saved to memory used " + s.ElapsedMilliseconds + " ms", lineNumber, caller);
                 s.Stop();
+                break;
             }
             if (rect.HasValue)
             {
@@ -175,6 +191,14 @@ namespace Zeraniumu
         /// <returns></returns>
         public bool ProcessAlive([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
+            if (proc == null)
+            {
+                var proclist = Process.GetProcessesByName(processName);
+                if (proclist.Count() > 0)
+                {
+                    proc = proclist.First();
+                }
+            }
             if(proc == null)
             {
                 return false;
@@ -238,8 +262,17 @@ namespace Zeraniumu
         /// <param name="location"></param>
         public void LeftClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
-            Imports.SendMessage(proc.MainWindowHandle, 0x201, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-            Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            if(ClickMethod == ClickMethod.RealMouseMove)
+            {
+                MoveMouse(location);
+                inputSimulator.Mouse.LeftButtonClick();
+            }
+            else
+            {
+                Imports.SendMessage(proc.MainWindowHandle, 0x201, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            }
+
         }
         /// <summary>
         /// Send right click
@@ -247,8 +280,16 @@ namespace Zeraniumu
         /// <param name="location"></param>
         public void RightClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
-            Imports.SendMessage(proc.MainWindowHandle, 0x204, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-            Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            if (ClickMethod == ClickMethod.RealMouseMove)
+            {
+                MoveMouse(location);
+                inputSimulator.Mouse.RightButtonClick();
+            }
+            else
+            {
+                Imports.SendMessage(proc.MainWindowHandle, 0x204, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            }
         }
         /// <summary>
         /// Send double left click
@@ -256,8 +297,16 @@ namespace Zeraniumu
         /// <param name="location"></param>
         public void LeftDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
-            Imports.SendMessage(proc.MainWindowHandle, 0x203, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-            Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            if (ClickMethod == ClickMethod.RealMouseMove)
+            {
+                MoveMouse(location);
+                inputSimulator.Mouse.LeftButtonDoubleClick();
+            }
+            else
+            {
+                Imports.SendMessage(proc.MainWindowHandle, 0x203, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            }
         }
         /// <summary>
         /// Send double right click
@@ -265,8 +314,16 @@ namespace Zeraniumu
         /// <param name="location"></param>
         public void RightDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
-            Imports.SendMessage(proc.MainWindowHandle, 0x206, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-            Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            if (ClickMethod == ClickMethod.RealMouseMove)
+            {
+                MoveMouse(location);
+                inputSimulator.Mouse.RightButtonDoubleClick();
+            }
+            else
+            {
+                Imports.SendMessage(proc.MainWindowHandle, 0x206, 0x00000001, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+            }
         }
         /// <summary>
         /// Move the mouse to location
@@ -390,5 +447,18 @@ namespace Zeraniumu
             this.rect = rect;
             logger.WritePrivateLog("Overrided capture rect as " + this.rect.Value.X + " " + this.rect.Value.Y + " " + this.rect.Value.Width + " " + this.rect.Value.Height);
         }
+    }
+
+    public enum CaptureMethod
+    {
+        GDIPlus,
+        HDCCapture,
+        GraphicCopy
+    }
+
+    public enum ClickMethod
+    {
+        WinAPI,
+        RealMouseMove
     }
 }

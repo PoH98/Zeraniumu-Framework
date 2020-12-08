@@ -13,7 +13,8 @@ namespace Zeraniumu.Helper
         {
             // Lock the bitmap's bits.  
             Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
+            Bitmap cloned = new Bitmap(bmp);
+            BitmapData bmpData = cloned.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
 
             // Get the address of the first line.
             IntPtr ptr = bmpData.Scan0;
@@ -34,7 +35,8 @@ namespace Zeraniumu.Helper
                     break;
                 }
             // Unlock the bits.
-            bmp.UnlockBits(bmpData);
+            cloned.UnlockBits(bmpData);
+            cloned.Dispose();
             return allBlack;
         }
     }

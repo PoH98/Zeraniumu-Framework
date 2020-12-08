@@ -562,5 +562,8 @@ namespace Zeraniumu
         {
             return (IntPtr)((HiWord << 16) | (LoWord & 0xffff));
         }
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
     }
 }
