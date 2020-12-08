@@ -211,6 +211,17 @@ Use this to open spefific application download page from playstore.
 core.OpenPlayStore("com.package.name");
 ```
 
+### Settings
+Here is some settings can be used in EmulatorController
+| Setting               | Default                             | Type                       | Decription                                                                                                                                       |
+|-----------------------|-------------------------------------|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| ResizeScreenshot      | true                                | bool                       | Check if the framework should crop the captured image to prefered size. Usefull in different situation to switch crop the image or not doing so. |
+| EmulatorCaptureMethod | EmulatorCaptureMethod.WinApiCapture | enum EmulatorCaptureMethod | Define how the framework capture screenshots. Change this if you get a black image.                                                              |
+| TapScale              | 1                                   | double                     | Scale up or down the tap position. Will be usefull in some devices or emulators                                                                  |
+| MinitouchPath  | adb\minitouch | string | The minitouch file location. By default this no need changes as the zip in release contains it.                              |
+| AdbPath        | adb           | string | The adb file path. By default this no need changes as the zip in release contains it.                                        |
+| KeepBackground | true          | bool   | Used to check if we need to kept the bot running on background. Used for multiple purpose like capturing screenshots and etc |
+
 ---
 ---
 ## ProcessController
@@ -329,6 +340,15 @@ Unlock user's mouse and keyboard
 ```
 core.Dispose();
 ```
+
+### Settings
+Here is some settings can be used for the ProcessController to execute it's job.
+
+| Setting       | Default                   | Type               | Decription                                                                                                                                                           |
+|---------------|---------------------------|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ClickScale    | 1                         | double             | It is used to scale up while clicking. Some devices might need to scale up or down to get it's click at the right position                                           |
+| CaptureMethod | CaptureMethod.GDIPlus     | enum CaptureMethod | It is used to define how the framework should capture a screenshot. Change this if you get a black screen!                                                           |
+| ClickMethod   | ClickMethod.RealMouseMove | enum ClickMethod   | You can choose how the framework performs its clicks. Using WinAPI or the real mouse moving for clicks. WinAPI can used for background however won't works everytime |
 
 ---
 ---
