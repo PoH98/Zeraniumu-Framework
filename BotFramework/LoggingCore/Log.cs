@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
+using Console = Colorful.Console;
 
 namespace Zeraniumu
 {
@@ -84,21 +85,7 @@ namespace Zeraniumu
             }
             else
             {
-                ConsoleColor consoleColor = ConsoleColor.Gray;
-                try
-                {
-                    if(color == Color.Lime || color == Color.LimeGreen || color == Color.DarkGreen)
-                    {
-                        consoleColor = ConsoleColor.Green;
-                    }
-                    consoleColor = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), color.ToKnownColor().ToString(), true);
-                }
-                catch (Exception)
-                {
-                    //Invalid color
-                }
-                Console.ForegroundColor = consoleColor;
-                Console.WriteLine(log);
+                Console.WriteLine(log, color);
             }
             try
             {

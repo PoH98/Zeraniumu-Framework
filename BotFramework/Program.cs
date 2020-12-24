@@ -2,11 +2,13 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using Console = Colorful.Console;
 
 namespace Zeraniumu
 {
@@ -44,19 +46,17 @@ namespace Zeraniumu
             ScriptParser parser = new ScriptParser(scriptfilePath);
             var assembly = parser.Compile();
             watch.Stop();
-            Console.WriteLine("File compiled in " + watch.ElapsedMilliseconds + " ms");
+            Console.WriteLine("File compiled in " + watch.ElapsedMilliseconds + " ms", Color.FromArgb(207,3,252));
             try
             {
                 assembly.GetType("Script.Executer").GetMethod("Run").Invoke(null, null);
             }
             catch(Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.ToString());
-                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine(ex.ToString(), Color.Red);
             }
 
-            Console.WriteLine("Script executed complete!");
+            Console.WriteLine("Script executed complete!", Color.FromArgb(207, 3, 252));
             Console.ReadKey();
         }
 
@@ -121,7 +121,7 @@ namespace Zeraniumu
                     sb.AppendLine(String.Format("Error ({0}): {1} at line {2} and {3}", error.ErrorNumber, error.ErrorText, error.Line - 7, error.Column));
                 }
 
-                Console.WriteLine(sb.ToString());
+                Console.WriteLine(sb.ToString(), Color.Red);
                 Console.ReadLine();
                 Environment.Exit(0);
             }

@@ -14,7 +14,6 @@ using Zeraniumu.Helper;
 using System.Text.RegularExpressions;
 using System.Net;
 using Emgu.CV.OCR;
-using System.Net.Http.Headers;
 
 namespace Zeraniumu
 {
@@ -184,7 +183,7 @@ namespace Zeraniumu
                 {
                     try
                     {
-                        if (emulator.EmulatorName().Split('|').Any(x => x == proc.ProcessName))
+                        if (emulator.EmulatorName().Split('|').Any(x => x == proc.ProcessName || x == proc.MainWindowTitle))
                         {
                             processlist.Add(proc);
                         }
