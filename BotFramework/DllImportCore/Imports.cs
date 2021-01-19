@@ -560,10 +560,25 @@ namespace Zeraniumu
         /// <returns></returns>
         public static IntPtr CreateLParam(int LoWord, int HiWord)
         {
-            return (IntPtr)((HiWord << 16) | (LoWord & 0xffff));
+            return (IntPtr)(LoWord | (HiWord << 16));
         }
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PointInter
+        {
+            public int X;
+            public int Y;
+            public static explicit operator Point(PointInter point) => new Point(point.X, point.Y);
+        }
+        /// <summary>
+        /// Get the cursor position
+        /// </summary>
+        /// <param name="lpPoint"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out PointInter lpPoint);
     }
 }
