@@ -23,6 +23,7 @@ Zeraniumu which is in japanese, means Geranium flower. Geranium have the meaning
 3. Here will having a special function. As we can't build classes in this method, the script supports `@include <another file>`. Its function is override the specific line with that specific file you defined. Hence you can reuse the part of code in anywhere.
 4. After completed the script, go to the `Zeraniumu.exe` and open command prompt there by pressing `shift + right click`. Type `Zeraniumu <your script path>` and press `Enter`
 5. The script will start execute now!
+6. You can run multiple scripts once, they will run at the same time, with multi-threading.
 ---
 ### Method 2: Compile an exe
 1. Use any C# coding program and create new project
@@ -55,6 +56,23 @@ This line will replaced with the file name you mention and reusable. Put it at t
 ```
 @include anotherScript.txt
 ```
+### @using <namespace>
+This line will be replaced with normal C# using, current limitation will be only supporting the dll which is same name with namespace.
+Will be upgraded to more flexible for this, but need time as I'm not quite free
+> Example：
+```
+@using System.Threading;
+```
+### SharedBag
+This class should be used to share resources between different asynchronized running scripts. However use it carefully as this might making the scripts running into trouble! The data stored is with thread-safe dictionary provided by Microsoft hence you don't need to worry about thread problem, just need to make sure the scripts able to get what they need in the right time!
+> Example:
+```
+SharedBag.SaveValue("PublicInteger", 10);//Create new value
+SharedBag.SaveValue("PublicInteger", 30);//Modify Value
+SharedBag.GetValue<int>("PublicInteger");//Get value as int
+SharedBag.DeleteValue<int>("PublicInteger");//Delete value and receive it's last result
+```
+
 ---
 ## Log
 > Example:

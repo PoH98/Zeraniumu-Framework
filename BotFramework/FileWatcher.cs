@@ -26,8 +26,7 @@ namespace Zeraniumu
             }
             /* Watch for changes in LastAccess and LastWrite times, and 
                the renaming of files or directories. */
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-               | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite;
             // Only watch text files.
             if (file.Contains("\\"))
             {
