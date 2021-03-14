@@ -338,6 +338,30 @@ Release keyboard press
 core.KeyboardRelease(VirtualKeyCode.SPACE); //Release previous spacebar button
 ```
 
+### GetIntPtr
+Get hWnd of process for setting up no mouse move clicks
+> Example:
+```
+//Get default process.MainWindowHandle
+var mainhWnd = core.GetIntPtr;
+//Get deeper child hWnd from MainWindowHandle
+mainhWnd = core.GetIntPtr("className", "string.Empty", main);
+```
+
+### GetChildrenPtrs
+Get all child hWnd in the parent hWnd, return IEnumerable<IntPtr> 
+> Example:
+```
+var listhWnd = core.GetChildrenPtrs(mainhWnd);
+```
+
+### SetIntPtr
+Set the click will pass to the hWnd if ClickMethod is WinAPI
+> Example:
+```
+core.SetIntPtr(mainhWnd);
+```
+
 ### KeyboardType
 Simulates keyboard typing
 > Example:
