@@ -343,7 +343,7 @@ Get hWnd of process for setting up no mouse move clicks
 > Example:
 ```
 //Get default process.MainWindowHandle
-var mainhWnd = core.GetIntPtr;
+var mainhWnd = core.GetIntPtr();
 //Get deeper child hWnd from MainWindowHandle
 mainhWnd = core.GetIntPtr("className", "string.Empty", main);
 ```
