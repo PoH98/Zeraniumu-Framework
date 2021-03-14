@@ -12,6 +12,7 @@ using Zeraniumu.MouseKeyboardCore;
 using Emgu.CV.OCR;
 using Zeraniumu.Helper;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Zeraniumu
 {
@@ -21,6 +22,9 @@ namespace Zeraniumu
         void KillProcess([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         bool ProcessAlive([CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         IntPtr GetIntPtr();
+        IntPtr GetIntPtr(string className, string windowTitle, IntPtr parent);
+        IEnumerable<IntPtr> GetChildrenPtrs(IntPtr parent);
+        bool SetIntPtr(IntPtr hWnd, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void LeftClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void RightClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void RightDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
@@ -47,6 +51,7 @@ namespace Zeraniumu
         private Random rnd = new Random();
         private Rectangle? rect = null;
         private IntPtr Screencaptureptr = IntPtr.Zero;
+        private IntPtr ClickPtr = IntPtr.Zero;
         /// <summary>
         /// Tesseract object
         /// </summary>
@@ -64,7 +69,7 @@ namespace Zeraniumu
         /// </summary>
         public ClickMethod ClickMethod { get; set; } = ClickMethod.RealMouseMove;
         /// <summary>
-        /// Definee a new ProcessController
+        /// Define a new ProcessController
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="processPath"></param>
@@ -168,6 +173,8 @@ namespace Zeraniumu
             }
             return proc.MainWindowHandle;
         }
+
+
         /// <summary>
         /// Kill the process
         /// </summary>
@@ -270,8 +277,16 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                if(ClickPtr == IntPtr.Zero)
+                {
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                }
+                else
+                {
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_LBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                }
             }
 
         }
@@ -288,8 +303,16 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle,(int)WMessages.WM_RBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                if(ClickPtr == IntPtr.Zero)
+                {
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                }
+                else
+                {
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_RBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                }
             }
         }
         /// <summary>
@@ -305,8 +328,17 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                if(ClickPtr == IntPtr.Zero)
+                {
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+
+                }
+                else
+                {
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_LBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                }
             }
         }
         /// <summary>
@@ -322,8 +354,16 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                if(ClickPtr == IntPtr.Zero)
+                {
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                }
+                else
+                {
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_RBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
+                    Imports.SendMessage(ClickPtr, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
+                }
             }
         }
         /// <summary>
@@ -442,18 +482,69 @@ namespace Zeraniumu
                 logger.WriteLog("Downloading...(" + e.ProgressPercentage + ")", Color.Cyan);
             }
         }
-
+        /// <summary>
+        /// Set Image Capture Crop Rectangle
+        /// </summary>
+        /// <param name="rect"></param>
         public void SetImageRect(Rectangle rect)
         {
             this.rect = rect;
             logger.WritePrivateLog("Overrided capture rect as " + this.rect.Value.X + " " + this.rect.Value.Y + " " + this.rect.Value.Width + " " + this.rect.Value.Height);
         }
-
+        /// <summary>
+        /// Get current cursor position
+        /// </summary>
+        /// <returns></returns>
         public Point GetCursorPosition()
         {
             Imports.PointInter pos;
             Imports.GetCursorPos(out pos);
             return new Point(pos.X, pos.Y);
+        }
+        /// <summary>
+        /// Get child IntPtr of the process. If no parent hWnd is input will auto use process's <see cref="Process.MainWindowHandle"/>. To get className and windowTitle, use WinSpy!
+        /// </summary>
+        /// <param name="className"></param>
+        /// <param name="windowTitle"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        public IntPtr GetIntPtr(string className, string windowTitle, IntPtr parent = default(IntPtr))
+        {
+            if(parent == default(IntPtr))
+            {
+                parent = proc.MainWindowHandle;
+            }
+            return Imports.FindWindowEx(parent, IntPtr.Zero, className, windowTitle);
+        }
+        /// <summary>
+        /// Set Mouse clicks send to which IntPtr. If not set will default use process's <see cref="Process.MainWindowHandle"/>.
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        public bool SetIntPtr(IntPtr hWnd, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            if(hWnd == default(IntPtr) || hWnd == IntPtr.Zero)
+            {
+                logger.WritePrivateLog("Click IntPtr set FAILED as IntPtr is Zero or not valid!", lineNumber, caller);
+                //Unable to set Ptr
+                return false;
+            }
+            logger.WritePrivateLog("Click IntPtr set SUCCESS with " + hWnd.ToInt32(), lineNumber, caller);
+            ClickPtr = hWnd;
+            return true;
+        }
+        /// <summary>
+        /// Get list of child IntPtr of the process. If no parent hWnd is input will auto use process's <see cref="Process.MainWindowHandle"/>.
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        public IEnumerable<IntPtr> GetChildrenPtrs(IntPtr parent = default(IntPtr))
+        {
+            if (parent == default(IntPtr))
+            {
+                parent = proc.MainWindowHandle;
+            }
+            return Imports.GetAllChildHandles(parent);
         }
 
         private enum WMessages : int
