@@ -270,7 +270,7 @@ namespace Zeraniumu
         /// </summary>
         /// <param name="hWnd"></param>
         /// <returns></returns>
-        [DllImport("USER32.DLL")]
+        [DllImport("user32.dll")]
         public static extern bool SetForegroundWindow(IntPtr hWnd);
         /// <summary>
         /// Get Parent's hWnd
@@ -419,7 +419,7 @@ namespace Zeraniumu
         /// <param name="hWnd"></param>
         /// <param name="bRevert"></param>
         /// <returns></returns>
-        [DllImport("user32")]
+        [DllImport("user32.dll")]
         public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         /// <summary>
         /// 
@@ -429,8 +429,11 @@ namespace Zeraniumu
         /// <param name="uEnable"></param>
         /// <returns></returns>
 
-        [DllImport("user32")]
+        [DllImport("user32.dll")]
         public static extern bool EnableMenuItem(IntPtr hMenu, uint itemId, uint uEnable);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr WindowFromPoint(int x, int y);
         /// <summary>
         /// 
         /// </summary>

@@ -30,6 +30,11 @@ namespace Zeraniumu
         void RightDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void LeftDoubleClick(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void MoveMouse(Point location, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+        void LeftClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+        void RightClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+        void RightDoubleClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+        void LeftDoubleClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+        void MoveMouse(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
         void HoldLeft();
         void ReleaseLeft();
         void HoldRight();
@@ -39,6 +44,8 @@ namespace Zeraniumu
         void KeyboardType(string text);
         void BlockInput();
         Point GetCursorPosition();
+        IntPtr GetWindowFromPoint(int x, int y);
+        IntPtr GetWindowFromPoint(Point point);
     }
     public class ProcessController : IProcessController
     {
@@ -288,7 +295,6 @@ namespace Zeraniumu
                     Imports.SendMessage(ClickPtr, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
                 }
             }
-
         }
         /// <summary>
         /// Send right click
@@ -520,7 +526,7 @@ namespace Zeraniumu
         /// Set Mouse clicks send to which IntPtr. If not set will default use process's <see cref="Process.MainWindowHandle"/>.
         /// </summary>
         /// <param name="hWnd"></param>
-        /// <returns></returns>
+        /// <returns>True if set success, but false if not valid</returns>
         public bool SetIntPtr(IntPtr hWnd, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
         {
             if(hWnd == default(IntPtr) || hWnd == IntPtr.Zero)
@@ -529,6 +535,7 @@ namespace Zeraniumu
                 //Unable to set Ptr
                 return false;
             }
+            ClickMethod = ClickMethod.WinAPI;
             logger.WritePrivateLog("Click IntPtr set SUCCESS with " + hWnd.ToInt32(), lineNumber, caller);
             ClickPtr = hWnd;
             return true;
@@ -545,6 +552,81 @@ namespace Zeraniumu
                 parent = proc.MainWindowHandle;
             }
             return Imports.GetAllChildHandles(parent);
+        }
+        /// <summary>
+        /// Send Left Click to position point x y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="lineNumber"></param>
+        /// <param name="caller"></param>
+        public void LeftClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            LeftClick(new Point(x, y));
+        }
+        /// <summary>
+        /// Send Right Click to position point x y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="lineNumber"></param>
+        /// <param name="caller"></param>
+        public void RightClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            RightClick(new Point(x, y));
+        }
+        /// <summary>
+        /// Send Double Right Click to position point x y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="lineNumber"></param>
+        /// <param name="caller"></param>
+        public void RightDoubleClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            RightDoubleClick(new Point(x, y));
+        }
+        /// <summary>
+        /// Send Double Left Click to position point x y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="lineNumber"></param>
+        /// <param name="caller"></param>
+        public void LeftDoubleClick(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            LeftDoubleClick(new Point(x, y));
+        }
+        /// <summary>
+        /// Move mouse to position point x y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="lineNumber"></param>
+        /// <param name="caller"></param>
+        public void MoveMouse(int x, int y, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            MoveMouse(new Point(x, y));
+        }
+        /// <summary>
+        /// Get the window IntPtr from point x y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public IntPtr GetWindowFromPoint(int x, int y)
+        {
+            return Imports.WindowFromPoint(x, y);
+        }
+        /// <summary>
+        /// Get the window IntPtr from point
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public IntPtr GetWindowFromPoint(Point point)
+        {
+            return GetWindowFromPoint(point.X, point.Y);
         }
 
         private enum WMessages : int
