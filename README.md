@@ -494,5 +494,3 @@ Current supported emulators:
 - [ ] ITools
 
 > If any other emulators needed to be supported, let me know!
-
-Buy me a cup of tea: <a href="https://paypal.me/PoH98?locale.x=en_US" rel="some text">Paypal</a>
