@@ -34,6 +34,7 @@ namespace Zeraniumu
         void KeyboardRelease(VirtualKeyCode code);
         void KeyboardType(string text);
         void BlockInput();
+        Point GetCursorPosition();
     }
     public class ProcessController : IProcessController
     {
@@ -269,8 +270,8 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle, 0x201, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
             }
 
         }
@@ -287,8 +288,8 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle, 0x204, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle,(int)WMessages.WM_RBUTTONDOWN, 1, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
             }
         }
         /// <summary>
@@ -304,8 +305,8 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle, 0x203, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, 0x202, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_LBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
             }
         }
         /// <summary>
@@ -321,8 +322,8 @@ namespace Zeraniumu
             }
             else
             {
-                Imports.SendMessage(proc.MainWindowHandle, 0x206, 0x00000001, Imports.CreateLParam(location.X, location.Y));
-                Imports.SendMessage(proc.MainWindowHandle, 0x205, 0x00000000, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONDBLCLK, 1, Imports.CreateLParam(location.X, location.Y));
+                Imports.SendMessage(proc.MainWindowHandle, (int)WMessages.WM_RBUTTONUP, 0, Imports.CreateLParam(location.X, location.Y));
             }
         }
         /// <summary>
@@ -447,6 +448,23 @@ namespace Zeraniumu
             this.rect = rect;
             logger.WritePrivateLog("Overrided capture rect as " + this.rect.Value.X + " " + this.rect.Value.Y + " " + this.rect.Value.Width + " " + this.rect.Value.Height);
         }
+
+        public Point GetCursorPosition()
+        {
+            Imports.PointInter pos;
+            Imports.GetCursorPos(out pos);
+            return new Point(pos.X, pos.Y);
+        }
+
+        private enum WMessages : int
+        {
+            WM_LBUTTONDOWN = 0x201, //Left mousebutton down
+            WM_LBUTTONUP = 0x202,   //Left mousebutton up
+            WM_LBUTTONDBLCLK = 0x203, //Left mousebutton doubleclick
+            WM_RBUTTONDOWN = 0x204, //Right mousebutton down
+            WM_RBUTTONUP = 0x205,   //Right mousebutton up
+            WM_RBUTTONDBLCLK = 0x206, //Right mousebutton do
+        }
     }
 
     public enum CaptureMethod
@@ -461,4 +479,5 @@ namespace Zeraniumu
         WinAPI,
         RealMouseMove
     }
+
 }
