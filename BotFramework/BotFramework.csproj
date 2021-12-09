@@ -149,6 +149,7 @@
     <Compile Include="SelectProcess.Designer.cs">
       <DependentUpon>SelectProcess.cs</DependentUpon>
     </Compile>
+    <Compile Include="SharedBag\SharedBag.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
