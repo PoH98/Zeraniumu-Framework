@@ -4,21 +4,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using Zeraniumu;
 
 namespace MostPopularEmulators
 {
     public class Bluestacks 
     {
-        private string BlueStackPath;
+        private string BlueStackPath, BootParameters, VBoxManager, AdbShellOptions;
         public Rectangle ActualSize()
         {
-            throw new NotImplementedException();
+            return new Rectangle(1, 31, 640, 360);
         }
 
         public string AdbIpPort()
         {
-            throw new NotImplementedException();
+            var port = Registry.LocalMachine.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android\Guests\Android\Config").GetValue("BstAdbPort").ToString();
+            return "127.0.0.1:" + port;
         }
 
         public bool CheckEmulatorExist(string arguments, ILog logger)
@@ -32,7 +34,7 @@ namespace MostPopularEmulators
                 return false;
             }
             var result = key.GetValue("Engine");
-            if(result.ToString().ToLower() == "plus")
+            if (result.ToString().ToLower() == "plus")
             {
                 plusMode = true;
             }
@@ -42,12 +44,13 @@ namespace MostPopularEmulators
             }
             var files = new List<string> { "HD-Quit.exe" };
             files.AddRange(frontendexe);
+            frontendexe = files.ToArray();
             BlueStackPath = key.GetValue("InstallDir").ToString();
-            string programFiles = Environment.ExpandEnvironmentVariables("%ProgramW6432%");
-            string programFilesX86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
             if (!Directory.Exists(BlueStackPath))
             {
-                if(Directory.Exists(Path.Combine(programFiles, "BlueStacks")))
+                string programFiles = Environment.ExpandEnvironmentVariables("%ProgramW6432%");
+                string programFilesX86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
+                if (Directory.Exists(Path.Combine(programFiles, "BlueStacks")))
                 {
                     BlueStackPath = Path.Combine(programFiles, "BlueStacks");
                 }
@@ -60,31 +63,46 @@ namespace MostPopularEmulators
                     return false;
                 }
             }
-            foreach(var file in files)
+            foreach(var file in frontendexe)
             {
-
+                if (File.Exists(Path.Combine(BlueStackPath,file)))
+                {
+                    VBoxManager = BlueStackPath + "BstkVMMgr.exe";
+                    AdbShellOptions = "/data/anr/../../system/xbin/bstk/su root";
+                    BlueStackPath = Path.Combine(BlueStackPath, file);
+                    BootParameters = key.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android").GetValue("BootParameters").ToString();
+                    
+                    return true;
+                }
             }
             return false;
         }
 
         public string DefaultArguments()
         {
-            throw new NotImplementedException();
+            return BootParameters;
         }
 
         public Rectangle DefaultSize()
         {
-            throw new NotImplementedException();
+            return new Rectangle(0, 0, 640, 360);
         }
 
         public string EmulatorName()
         {
-            throw new NotImplementedException();
+            return "BlueStacks";
         }
 
         public void SetResolution(int x, int y, int dpi)
         {
-            throw new NotImplementedException();
+            var key = Registry.LocalMachine.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android\FrameBuffer\0");
+            key.SetValue("FullScreen", 0, RegistryValueKind.DWord);
+            key.SetValue("GuestHeight", y, RegistryValueKind.DWord);
+            key.SetValue("GuestWidth", x, RegistryValueKind.DWord);
+            key.SetValue("WindowHeight", y, RegistryValueKind.DWord);
+            key.SetValue("GuestWidth", x, RegistryValueKind.DWord);
+            BootParameters = Regex.Replace(BootParameters, "DPI=\\d+", "DPI=" + dpi);
+            Registry.LocalMachine.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android").SetValue("BootParameters", BootParameters , RegistryValueKind.String);
         }
 
         public void StartEmulator(string arguments)
@@ -99,7 +117,7 @@ namespace MostPopularEmulators
 
         public void UnUnbotify(EmulatorController controller)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
