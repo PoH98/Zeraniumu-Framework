@@ -5,18 +5,20 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Zeraniumu;
 
 namespace MostPopularEmulators
 {
-    public class Bluestacks 
+    public class Bluestacks:IEmulator
     {
-        private string BlueStackPath, BootParameters, VBoxManager, AdbShellOptions;
+        private string BlueStackPath, BootParameters, VBoxManagerPath, _adbShellOptions;
+        private Process bluestacks;
         public Rectangle ActualSize()
         {
-            return new Rectangle(1, 31, 640, 360);
+            return new Rectangle(1, 31, 960, 540);
         }
-
+        public string AdbShellOptions => _adbShellOptions;
         public string AdbIpPort()
         {
             var port = Registry.LocalMachine.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android\Guests\Android\Config").GetValue("BstAdbPort").ToString();
@@ -67,8 +69,8 @@ namespace MostPopularEmulators
             {
                 if (File.Exists(Path.Combine(BlueStackPath,file)))
                 {
-                    VBoxManager = BlueStackPath + "BstkVMMgr.exe";
-                    AdbShellOptions = "/data/anr/../../system/xbin/bstk/su root";
+                    VBoxManagerPath = BlueStackPath + "BstkVMMgr.exe";
+                    _adbShellOptions = "/data/anr/../../system/xbin/bstk/su root";
                     BlueStackPath = Path.Combine(BlueStackPath, file);
                     BootParameters = key.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android").GetValue("BootParameters").ToString();
                     
@@ -85,12 +87,12 @@ namespace MostPopularEmulators
 
         public Rectangle DefaultSize()
         {
-            return new Rectangle(0, 0, 640, 360);
+            return new Rectangle(0, 0, 960, 540);
         }
 
         public string EmulatorName()
         {
-            return "BlueStacks";
+            return "BlueStacks|藍疊";
         }
 
         public void SetResolution(int x, int y, int dpi)
@@ -107,17 +109,61 @@ namespace MostPopularEmulators
 
         public void StartEmulator(string arguments)
         {
-            throw new NotImplementedException();
+            ProcessStartInfo info = new ProcessStartInfo();
+            info.FileName = BlueStackPath;
+            info.Arguments = arguments;
+            bluestacks = Process.Start(info);
+            Thread.Sleep(5000);
         }
 
         public void StopEmulator(Process emulator, string arguments)
         {
-            throw new NotImplementedException();
+            ProcessStartInfo close = new ProcessStartInfo();
+            close.FileName = VBoxManagerPath;
+            if (arguments.Length > 0)
+            {
+                close.Arguments = "controlvm " + arguments + " poweroff";
+            }
+            else
+            {
+                close.Arguments = "controlvm MEmu poweroff";
+            }
+            close.CreateNoWindow = true;
+            close.WindowStyle = ProcessWindowStyle.Hidden;
+            try
+            {
+                emulator.Kill();
+            }
+            catch
+            {
+
+            }
+            Process p = Process.Start(close);
+            Thread.Sleep(5000);
+            if (!p.HasExited)
+            {
+                try
+                {
+                    p.Kill();
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         public void UnUnbotify(EmulatorController controller)
         {
-            
+            controller.ExecuteAdbCommand("rm -f /system/bin/microvirtd");
+            controller.ExecuteAdbCommand("rm -f /system/etc/init.microvirt.sh");
+            controller.ExecuteAdbCommand("rm -f /system/bin/memud");
+            controller.ExecuteAdbCommand("rm -f /system/lib/memuguest.ko");
+        }
+
+        public Point GetAccurateClickPoint(Point point)
+        {
+            return new Point(32767 / ActualSize().Width * point.X, 32767 / ActualSize().Height * point.Y);
         }
     }
 }

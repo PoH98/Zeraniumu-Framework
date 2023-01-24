@@ -19,6 +19,8 @@ namespace Zeraniumu
 
         List<Point> FindImage(IImageData image, bool FindOnlyOne, double matchRadius, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
 
+        List<Point> FindImage(string path, bool FindOnlyOne, double matchRadius, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
+
         IImageData Crop(Rectangle area, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
 
         bool ColorMatch(Point location, Color color, double matchRadius, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null);
@@ -253,5 +255,17 @@ namespace Zeraniumu
         /// </summary>
         /// <returns></returns>
         public abstract string OCR(IController controller);
+
+        public List<Point> FindImage(string path, bool FindOnlyOne, double matchRadius, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null)
+        {
+            if (path.EndsWith("xml"))
+            {
+                return FindImage(new ScreenShot(path, logger, false), FindOnlyOne, matchRadius);
+            }
+            else
+            {
+                return FindImage(new ScreenShot(path, logger, false, false), FindOnlyOne, matchRadius);
+            }
+        }
     }
 }

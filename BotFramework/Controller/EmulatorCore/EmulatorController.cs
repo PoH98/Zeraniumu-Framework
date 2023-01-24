@@ -79,10 +79,6 @@ namespace Zeraniumu
         /// </summary>
         public string MinitouchPath { get; set; } = "adb\\minitouch";
         /// <summary>
-        /// The tapping scale, normally will be 1, some emulators will need larger or smaller for accurate click
-        /// </summary>
-        public double TapScale { get; set; } = 1;
-        /// <summary>
         /// Tesseract object, normally won't use this so just ignore it
         /// </summary>
         public object Tesseract { get; set; }
@@ -104,7 +100,8 @@ namespace Zeraniumu
                 try
                 {
                     var assembly = Assembly.LoadFrom(dll);
-                    foreach (var t in assembly.GetTypes())
+                    var types = assembly.GetTypes();
+                    foreach (var t in types)
                     {
                         if (t.GetInterface("IEmulator") != null)
                         {
@@ -513,14 +510,15 @@ namespace Zeraniumu
             {
                 adbController = new AdbController(AdbPath, logger);
                 adbController.SelectDevice(emulator.AdbIpPort());
+                adbController.SetShellOptions(emulator.AdbShellOptions);
                 adbController.WaitDeviceStart();
-                minitouchController = new MinitouchController(adbController, MinitouchPath, TapScale);
+                minitouchController = new MinitouchController(adbController, MinitouchPath, emulator);
                 minitouchController.Install();
-                adbController.Execute("input keyevent KEYCODE_HOME");
+                adbController.Execute("input keyevent 3");
                 Thread.Sleep(3000);
                 adbController.Execute("settings put system font_scale 1.0");
                 emulator.UnUnbotify(this);
-                logger.WriteLog("Emulator Connection Success!");
+                logger.WriteLog("Emulator Connection Success!", Color.Lime);
             }
             catch(Exception ex)
             {

@@ -14,6 +14,9 @@ namespace MostPopularEmulators
     {
         private string NoxFile, VBoxManagerPath, arguments;
         private ILog logger;
+
+        public string AdbShellOptions => null;
+
         public Rectangle ActualSize()
         {
             return new Rectangle(1,1,640, 360);
@@ -293,6 +296,11 @@ namespace MostPopularEmulators
         public void UnUnbotify(EmulatorController controller)
         {
             
+        }
+
+        public Point GetAccurateClickPoint(Point point)
+        {
+            return point;
         }
     }
 }

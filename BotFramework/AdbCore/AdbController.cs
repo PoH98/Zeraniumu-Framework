@@ -33,6 +33,7 @@ namespace Zeraniumu
             CreateNoWindow = true,
             WindowStyle = ProcessWindowStyle.Hidden
         };
+        private string adbshelloptions;
         /// <summary>
         /// Create new adb controller
         /// </summary>
@@ -89,6 +90,20 @@ namespace Zeraniumu
             }
         }
 
+        internal void SetShellOptions(string shellOptions)
+        {
+            adbshelloptions = shellOptions;
+            if (string.IsNullOrEmpty(adbshelloptions))
+            {
+                adbshelloptions = string.Empty;
+            }
+        }
+
+        internal string GetShellOptions()
+        {
+            return adbshelloptions;
+        }
+
         /// <summary>
         /// Select a device based on adb ip:port format string
         /// </summary>
@@ -121,8 +136,13 @@ namespace Zeraniumu
             {
                 output = Execute("getprop sys.boot_completed");
                 Thread.Sleep(1000);
+                if(output.Contains("not found"))
+                {
+                    logger.WritePrivateLog("Shell option not supported and will be disabled");
+                    adbshelloptions = string.Empty;
+                }
             }
-            while (output == null || !output.Contains("1"));
+            while (output == null || !output.Contains("1") || output.Contains("not found"));
             logger.WritePrivateLog("device wait completed");
         }
         /// <summary>
@@ -148,7 +168,7 @@ namespace Zeraniumu
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
             try
             {
-                client.ExecuteRemoteCommand(command, selectedDevice, receiver);
+                client.ExecuteRemoteCommand(adbshelloptions + command, selectedDevice, receiver);
             }
             catch(Exception ex)
             {
@@ -158,7 +178,7 @@ namespace Zeraniumu
                 }
                 receiver.AddOutput(ex.ToString());
             }
-            logger.WritePrivateLog("Execute " + command + " Result:"+ receiver.ToString(), lineNumber, caller);
+            logger.WritePrivateLog("Execute " + adbshelloptions + command + " Result:"+ receiver.ToString(), lineNumber, caller);
             return receiver.ToString();
         }
 

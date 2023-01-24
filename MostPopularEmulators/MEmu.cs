@@ -18,7 +18,7 @@ namespace MostPopularEmulators
         {
             return new Rectangle(1, 31, 640, 360);
         }
-
+        public string AdbShellOptions => null;
         public string AdbIpPort()
         {
             var path = location.ToString().Replace("\0", "");
@@ -243,6 +243,11 @@ namespace MostPopularEmulators
             {
 
             }
+        }
+
+        public Point GetAccurateClickPoint(Point point)
+        {
+            return point;
         }
     }
 }

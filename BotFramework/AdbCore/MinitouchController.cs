@@ -14,9 +14,9 @@ namespace Zeraniumu.AdbCore
         private int minitouchPort = 1111;
         private AdbController controller;
         private string minitouchpath;
-        private double Scale = 1;
+        private IEmulator emulator;
         private Random rnd = new Random();
-        internal MinitouchController(AdbController controller, string minitouchpath, double Scale = 1)
+        internal MinitouchController(AdbController controller, string minitouchpath, IEmulator emulator)
         {
             this.minitouchpath = minitouchpath;
             this.controller = controller;
@@ -47,7 +47,7 @@ namespace Zeraniumu.AdbCore
             {
                 stream.WriteLine(minitouchPort); //Let other instance know that this socket is in use!
             }
-            this.Scale = Scale;
+            this.emulator = emulator;
         }
 
         internal void Install()
@@ -97,10 +97,11 @@ namespace Zeraniumu.AdbCore
             {
                 Install();
             }
-            int x = (int)Math.Round(rnd.Next(location.X - 10, location.X + 10) * Scale);
-            int y = (int)Math.Round(rnd.Next(location.Y - 10, location.Y - 10) * Scale);
-            int pressure = (int)Math.Round(rnd.Next(50, 200) * Scale);
-            string cmd = $"d 0 {x} {y} {pressure}\nc\nu 0\nc\n";
+            int x = (int)Math.Round((double)rnd.Next(location.X - 10, location.X + 10));
+            int y = (int)Math.Round((double)rnd.Next(location.Y - 10, location.Y - 10));
+            int pressure = (int)Math.Round((double)rnd.Next(50, 200));
+            var p = emulator.GetAccurateClickPoint(new Point(x, y));
+            string cmd = $"d 0 {p.X} {p.Y} {pressure}\nc\nu 0\nc\n";
             byte[] bytes = AdbClient.Encoding.GetBytes(cmd);
             try
             {
@@ -121,10 +122,11 @@ namespace Zeraniumu.AdbCore
             {
                 Install();
             }
-            int x = (int)Math.Round(rnd.Next(location.X - 10, location.X + 10) * Scale);
-            int y = (int)Math.Round(rnd.Next(location.Y - 10, location.Y - 10) * Scale);
-            int pressure = (int)Math.Round(rnd.Next(50, 200) * Scale);
-            string cmd = $"d 0 {x} {y} {pressure}\nc";
+            int x = (int)Math.Round((double)rnd.Next(location.X - 10, location.X + 10));
+            int y = (int)Math.Round((double)rnd.Next(location.Y - 10, location.Y - 10));
+            int pressure = (int)Math.Round((double)rnd.Next(50, 200));
+            var p = emulator.GetAccurateClickPoint(new Point(x, y));
+            string cmd = $"d 0 {p.X} {p.Y} {pressure}\nc";
             byte[] bytes = AdbClient.Encoding.GetBytes(cmd);
             minitouchSocket.Send(bytes, 0, bytes.Length, SocketFlags.None);
             Thread.Sleep(interval);

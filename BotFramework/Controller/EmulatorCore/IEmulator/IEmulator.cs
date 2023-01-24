@@ -56,5 +56,15 @@ namespace Zeraniumu
         /// </summary>
         /// <returns></returns>
         string DefaultArguments();
+        /// <summary>
+        /// Some emulators need extra options on adb execute
+        /// </summary>
+        string AdbShellOptions { get; }
+        /// <summary>
+        /// Get accurate click points for each emulators
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        Point GetAccurateClickPoint(Point point);
     }
 }
