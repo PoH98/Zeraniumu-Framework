@@ -24,6 +24,16 @@ namespace Zeraniumu
         private string adbipport;
         private Framebuffer framebuffer;
         private ILog logger;
+        private ProcessStartInfo minitouchConsole = new ProcessStartInfo
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            RedirectStandardInput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden,
+        };
+        private IShellOutputReceiver minitouchReceiver;
         private ProcessStartInfo checknet = new ProcessStartInfo()
         {
             FileName = "cmd",
@@ -40,6 +50,7 @@ namespace Zeraniumu
         /// <param name="adbPath"></param>
         internal AdbController(string adbPath, ILog logger)
         {
+            minitouchConsole.FileName = Path.Combine(adbPath, "adb.exe");
             server.StartServer(Path.Combine(adbPath, "adb.exe"), false);
             this.logger = logger;
             KillPortUsage();
@@ -79,7 +90,7 @@ namespace Zeraniumu
                         var pid = Convert.ToInt32(line.Substring(line.LastIndexOf(" ")).Trim());
                         Process p = Process.GetProcessById(pid);
                         p.CloseMainWindow();
-                        Thread.Sleep(1000);
+                        Thread.Sleep(500);
                         p.Kill();
                     }
                 }
@@ -172,14 +183,29 @@ namespace Zeraniumu
             }
             catch(Exception ex)
             {
-                if(ex.Message.Contains("device offline"))
+                if(ex.Message.Contains("device offline") || (ex.Message.Contains("device") && ex.Message.Contains(" not found")))
                 {
-                    throw new Exception("device offline");
+                    throw;
                 }
                 receiver.AddOutput(ex.ToString());
             }
-            logger.WritePrivateLog("Execute " + adbshelloptions + command + " Result:"+ receiver.ToString(), lineNumber, caller);
+            logger.WritePrivateLog("Execute " +  command + " Result:"+ receiver.ToString(), lineNumber, caller);
             return receiver.ToString();
+        }
+
+        internal Process STDINMinitouch(IShellOutputReceiver shellOutputReceiver, string minitouchPath)
+        {
+            minitouchReceiver = shellOutputReceiver;
+            minitouchConsole.Arguments = "-s " + adbipport + " shell " + adbshelloptions +  minitouchPath + " -i";
+            logger.WritePrivateLog("minitouch connected with STDIN: -s " + adbipport + " shell " + adbshelloptions + minitouchPath + " -i");
+            var p = Process.Start(minitouchConsole);
+            p.OutputDataReceived += P_OutputDataReceived;
+            return p;
+        }
+
+        private void P_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            minitouchReceiver.AddOutput(e.Data);
         }
 
         /// <summary>

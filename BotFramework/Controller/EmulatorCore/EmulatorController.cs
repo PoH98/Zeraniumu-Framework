@@ -161,7 +161,7 @@ namespace Zeraniumu
 
             }
             StartExecute++;
-            if(StartExecute > 3)
+            if(StartExecute > 2)
             {
                 StopEmulator();
                 StartExecute = 0;
@@ -188,6 +188,13 @@ namespace Zeraniumu
                     catch
                     {
                         //Some process might conduct null process name
+                    }
+                }
+                if(processlist.Count < 1)
+                {
+                    if (retryCount > 1)
+                    {
+                        StopEmulator();
                     }
                 }
             }
@@ -512,7 +519,7 @@ namespace Zeraniumu
                 adbController.SelectDevice(emulator.AdbIpPort());
                 adbController.SetShellOptions(emulator.AdbShellOptions);
                 adbController.WaitDeviceStart();
-                minitouchController = new MinitouchController(adbController, MinitouchPath, emulator);
+                minitouchController = new MinitouchController(adbController, MinitouchPath, emulator, logger);
                 minitouchController.Install();
                 adbController.Execute("input keyevent 3");
                 Thread.Sleep(3000);
@@ -723,7 +730,7 @@ namespace Zeraniumu
             {
                 WebClient wc = new WebClient();
                 wc.DownloadProgressChanged += Wc_DownloadProgressChanged;
-                await wc.DownloadFileTaskAsync(new Uri("https://github.com/tesseract-ocr/tessdata/raw/master/"+language+".traineddata"), "tessdata\\" + language + ".traineddata");
+                await wc.DownloadFileTaskAsync(new Uri("https://github.com/tesseract-ocr/tessdata/raw/main/"+language+".traineddata"), "tessdata\\" + language + ".traineddata");
                 wc.Dispose();
             }
             Tesseract = new Tesseract("tessdata", language, OcrEngineMode.TesseractLstmCombined, whiteList);
@@ -746,12 +753,13 @@ namespace Zeraniumu
         /// <param name="rect"></param>
         public void ResizeToPreferedSize()
         {
-            var capt = Screenshot().ToBitmap();
-            if (emulator.DefaultSize().Width != capt.Width && emulator.DefaultSize().Height != capt.Height)
+            Rectangle rec = Rectangle.Empty;
+            Imports.GetWindowRect(emulatorProcess.Handle, ref rec);
+            if (emulator.ActualSize().Width != rec.Width && emulator.ActualSize().Height != rec.Height)
             {
                 StopEmulator();
                 logger.WriteLog("Resolution not supported, resizing...", Color.Red);
-                emulator.SetResolution(emulator.DefaultSize().Width, emulator.DefaultSize().Height, 192);
+                emulator.SetResolution(emulator.ActualSize().Width, emulator.ActualSize().Height, 190);
                 StartEmulator();
                 ConnectEmulator();
             }

@@ -19,6 +19,11 @@ namespace MostPopularEmulators
             return new Rectangle(1, 31, 640, 360);
         }
         public string AdbShellOptions => null;
+
+        public MinitouchMode MinitouchMode => throw new NotImplementedException();
+
+        public SharedFolder GetSharedFolder => throw new NotImplementedException();
+
         public string AdbIpPort()
         {
             var path = location.ToString().Replace("\0", "");

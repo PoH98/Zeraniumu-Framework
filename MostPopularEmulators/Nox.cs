@@ -17,6 +17,10 @@ namespace MostPopularEmulators
 
         public string AdbShellOptions => null;
 
+        public MinitouchMode MinitouchMode => throw new NotImplementedException();
+
+        public SharedFolder GetSharedFolder => throw new NotImplementedException();
+
         public Rectangle ActualSize()
         {
             return new Rectangle(1,1,640, 360);

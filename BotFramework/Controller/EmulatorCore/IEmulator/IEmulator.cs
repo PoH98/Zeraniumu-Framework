@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
-using System.Windows.Forms;
+using System;
 
 namespace Zeraniumu
 {
@@ -66,5 +66,21 @@ namespace Zeraniumu
         /// <param name="point"></param>
         /// <returns></returns>
         Point GetAccurateClickPoint(Point point);
+        /// <summary>
+        /// Set default minitouch should use which mode, keeps original not implemented exception will use UDP
+        /// </summary>
+        MinitouchMode MinitouchMode { get; }
+        /// <summary>
+        /// Used to set minitouch and screenshot images to, for better method than remounting temp folder frequently.
+        /// <seealso cref="NotImplementedException"/> or <seealso cref="null"/> will use mount android temp folder
+        /// </summary>
+        SharedFolder GetSharedFolder { get; }
+
+    }
+
+    public enum MinitouchMode
+    {
+        UDP = 0,
+        STD = 1
     }
 }

@@ -8,14 +8,14 @@ namespace Zeraniumu
     }
     public class Script
     {
-        private IScript script;
+        protected IScript script;
         private Thread t;
         public Script(IScript script)
         {
             this.script = script;
         }
 
-        public void Start()
+        public virtual void Start()
         {
             try
             {
@@ -34,7 +34,7 @@ namespace Zeraniumu
 
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             try
             {

@@ -10,7 +10,7 @@ using Zeraniumu;
 
 namespace MostPopularEmulators
 {
-    public class Bluestacks:IEmulator
+    public class Bluestacks : IEmulator
     {
         private string BlueStackPath, BootParameters, VBoxManagerPath, _adbShellOptions;
         private Process bluestacks;
@@ -19,6 +19,34 @@ namespace MostPopularEmulators
             return new Rectangle(1, 31, 960, 540);
         }
         public string AdbShellOptions => _adbShellOptions;
+
+        public MinitouchMode MinitouchMode => MinitouchMode.STD;
+
+        public SharedFolder GetSharedFolder 
+        {
+            get
+            {
+                SharedFolder sharedFolder = new SharedFolder
+                {
+                    AndroidPath = "/storage/sdcard/windows/BstSharedFolder/"
+                };
+                for(int x = 0; x < 5; x++)
+                {
+                    var reg = Registry.LocalMachine.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android\SharedFolder\" + x);
+                    var folder = reg.GetValue("Name").ToString();
+                    if(folder == "BstSharedFolder")
+                    {
+                        sharedFolder.PCPath = reg.GetValue("Path").ToString();
+                    }
+                }
+                if(sharedFolder.PCPath == null)
+                {
+                    throw new NotImplementedException();
+                }
+                return sharedFolder;
+            }   
+        }
+
         public string AdbIpPort()
         {
             var port = Registry.LocalMachine.OpenSubKey(@"\SOFTWARE\BlueStacks\Guests\Android\Guests\Android\Config").GetValue("BstAdbPort").ToString();
@@ -126,7 +154,7 @@ namespace MostPopularEmulators
             }
             else
             {
-                close.Arguments = "controlvm MEmu poweroff";
+                close.Arguments = "controlvm Android poweroff";
             }
             close.CreateNoWindow = true;
             close.WindowStyle = ProcessWindowStyle.Hidden;
@@ -139,7 +167,7 @@ namespace MostPopularEmulators
 
             }
             Process p = Process.Start(close);
-            Thread.Sleep(5000);
+            Thread.Sleep(2000);
             if (!p.HasExited)
             {
                 try
@@ -150,6 +178,10 @@ namespace MostPopularEmulators
                 {
 
                 }
+            }
+            if(!bluestacks.HasExited)
+            {
+                bluestacks.Kill();
             }
         }
 

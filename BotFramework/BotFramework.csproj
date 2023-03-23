@@ -90,6 +90,7 @@
     <Compile Include="AdbCore\MinitouchController.cs" />
     <Compile Include="ConfigCore\Config.cs" />
     <Compile Include="Controller\Controller.cs" />
+    <Compile Include="Controller\EmulatorCore\IEmulator\SharedFolder.cs" />
     <Compile Include="DelayCore\Delay.cs" />
     <Compile Include="DllImportCore\Imports.cs" />
     <Compile Include="Controller\EmulatorCore\EmulatorController.cs" />

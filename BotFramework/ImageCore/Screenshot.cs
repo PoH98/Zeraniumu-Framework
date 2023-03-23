@@ -262,6 +262,7 @@ namespace Zeraniumu
                     CvInvoke.cvCopy(image.GetPtr(), dest.Ptr, IntPtr.Zero);
                     if (Bgr)
                     {
+                        dest.Convert<Bgr, byte>().Save("debug_find.png");
                         using (Image<Gray, float> result = (this.image as Image<Bgr, byte>).MatchTemplate(dest.Convert<Bgr, byte>(), TemplateMatchingType.CcoeffNormed))
                         {
                             result.MinMax(out double[] minValues, out double[] maxValues, out Point[] minLocations, out Point[] maxLocations);
